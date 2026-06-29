@@ -1,18 +1,15 @@
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from uuid import uuid4
 
 from src.identity.application.dtos.auth_result_dto import AuthResultDto
 from src.identity.application.dtos.signup_dto import SignupInputDto
+from src.identity.application.use_cases.constants import REFRESH_TOKEN_TTL_DAYS
 from src.identity.domain.entities.refresh_token import RefreshToken
 from src.identity.domain.entities.user import User
 from src.identity.domain.ports.password_hasher import PasswordHasher
 from src.identity.domain.ports.token_service import TokenService
 from src.identity.domain.ports.unit_of_work import IdentityUnitOfWork
 from src.identity.domain.value_objects.email import Email
-from src.identity.domain.value_objects.user_id import UserId
-
-_REFRESH_TOKEN_TTL_DAYS = 30
 
 
 @dataclass
@@ -31,23 +28,18 @@ class SignupUseCase:
             if await uow.user_query.exists_by_username(dto.username):
                 raise ValueError("Username is already taken")
 
-            user = User(
-                id=UserId(uuid4()),
+            user = User.create(
                 email=email,
                 username=dto.username,
                 password_hash=self.password_hasher.hash(dto.password),
-                is_active=True,
-                is_verified=False,
             )
             await uow.user_command.save(user)
 
             raw_refresh_token = self.token_service.generate_refresh_token()
-            refresh_token = RefreshToken(
-                id=uuid4(),
+            refresh_token = RefreshToken.create(
                 user_id=user.id.value,
                 token_hash=self.password_hasher.hash(raw_refresh_token),
-                expires_at=datetime.now() + timedelta(days=_REFRESH_TOKEN_TTL_DAYS),
-                revoked=False,
+                expires_at=datetime.now() + timedelta(days=REFRESH_TOKEN_TTL_DAYS),
             )
             await uow.refresh_token_command.save(refresh_token)
 

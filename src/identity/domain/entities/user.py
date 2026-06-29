@@ -1,7 +1,10 @@
 from dataclasses import dataclass, field
 from datetime import datetime
-from src.identity.domain.value_objects.user_id import UserId
+from uuid import uuid4
+
 from src.identity.domain.value_objects.email import Email
+from src.identity.domain.value_objects.user_id import UserId
+
 
 @dataclass
 class User():
@@ -35,3 +38,14 @@ class User():
         """Verify if the provided password matches the stored password hash."""
         # TODO: Implement password verification logic (e.g., using bcrypt or argon2)
         return self.password_hash == password
+
+    @classmethod
+    def create(cls, email: Email, username: str, password_hash: str) -> "User":
+        return cls(
+            id=UserId(uuid4()),
+            email=email,
+            username=username,
+            password_hash=password_hash,
+            is_active=True,
+            is_verified=False,
+        )
