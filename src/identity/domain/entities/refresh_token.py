@@ -1,7 +1,9 @@
 from dataclasses import dataclass, field
 from datetime import datetime
-from uuid import UUID
+from uuid import UUID, uuid4
+
 from typing import Optional
+
 
 @dataclass
 class RefreshToken:
@@ -20,3 +22,13 @@ class RefreshToken:
     
     def is_valid(self, now: datetime):
         return (not self.revoked) and (not self.is_expired(now))
+
+    @classmethod
+    def create(cls, user_id: UUID, token_hash: str, expires_at: datetime) -> "RefreshToken":
+        return cls(
+            id=uuid4(),
+            user_id=user_id,
+            token_hash=token_hash,
+            expires_at=expires_at,
+            revoked=False,
+        )
