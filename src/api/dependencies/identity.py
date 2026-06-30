@@ -15,7 +15,7 @@ from src.identity.application.use_cases.reset_password import ResetPasswordUseCa
 from src.identity.application.use_cases.signup import SignupUseCase
 from src.identity.application.use_cases.verify_email import VerifyEmailUseCase
 from src.identity.domain.ports.email_service import EmailService
-from src.identity.repository.unit_of_work import SQLAlchemyIdentityUnitOfWork
+from identity.infrastructure.repository.unit_of_work import SQLAlchemyIdentityUnitOfWork
 
 
 class _UnimplementedEmailService:

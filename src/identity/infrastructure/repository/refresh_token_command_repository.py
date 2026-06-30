@@ -5,8 +5,8 @@ from sqlalchemy import delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.identity.domain.entities.refresh_token import RefreshToken
-from src.identity.repository.models.refresh_token_model import RefreshTokenModel
-from src.identity.repository.transformers.refresh_token_transformer import RefreshTokenTransformer
+from identity.infrastructure.repository.models.refresh_token_model import RefreshTokenModel
+from identity.infrastructure.repository.transformers.refresh_token_transformer import RefreshTokenTransformer
 
 
 class SQLAlchemyRefreshTokenCommandRepository:

@@ -5,8 +5,8 @@ from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.identity.domain.entities.password_reset_token import PasswordResetToken
-from src.identity.repository.models.password_reset_token_model import PasswordResetTokenModel
-from src.identity.repository.transformers.password_reset_token_transformer import PasswordResetTokenTransformer
+from identity.infrastructure.repository.models.password_reset_token_model import PasswordResetTokenModel
+from identity.infrastructure.repository.transformers.password_reset_token_transformer import PasswordResetTokenTransformer
 
 
 class SQLAlchemyPasswordResetTokenCommandRepository:

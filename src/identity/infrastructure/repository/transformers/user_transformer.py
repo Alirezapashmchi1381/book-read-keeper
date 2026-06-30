@@ -1,7 +1,7 @@
 from src.identity.domain.entities.user import User
 from src.identity.domain.value_objects.email import Email
 from src.identity.domain.value_objects.user_id import UserId
-from src.identity.repository.models.user_model import UserModel
+from identity.infrastructure.repository.models.user_model import UserModel
 
 
 class UserTransformer:

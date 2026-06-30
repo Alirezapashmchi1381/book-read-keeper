@@ -1,5 +1,5 @@
 from src.identity.domain.entities.email_verification_token import EmailVerificationToken
-from src.identity.repository.models.email_verification_token_model import EmailVerificationTokenModel
+from identity.infrastructure.repository.models.email_verification_token_model import EmailVerificationTokenModel
 
 
 class EmailVerificationTokenTransformer:

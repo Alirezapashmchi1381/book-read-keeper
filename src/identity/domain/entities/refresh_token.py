@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
-from uuid import UUID, uuid4
+from uuid import UUID
+from uuid6 import uuid7
 
 from typing import Optional
 
@@ -26,7 +27,7 @@ class RefreshToken:
     @classmethod
     def create(cls, user_id: UUID, token_hash: str, expires_at: datetime) -> "RefreshToken":
         return cls(
-            id=uuid4(),
+            id=uuid7(),
             user_id=user_id,
             token_hash=token_hash,
             expires_at=expires_at,

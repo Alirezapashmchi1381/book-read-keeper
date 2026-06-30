@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
-from uuid import UUID, uuid4
+from uuid import UUID
+from uuid6 import uuid7
 
 
 @dataclass
@@ -17,7 +18,7 @@ class EmailVerificationToken:
     @classmethod
     def create(cls, user_id: UUID, token_hash: str, expires_at: datetime) -> "EmailVerificationToken":
         return cls(
-            id=uuid4(),
+            id=uuid7(),
             user_id=user_id,
             token_hash=token_hash,
             expires_at=expires_at,

@@ -6,10 +6,10 @@ from src.identity.domain.ports.user_command_repository import UserCommandReposit
 from src.identity.domain.ports.user_query_repository import UserQueryRepository
 
 # These will be created when the concrete repository modules are written.
-from src.identity.repository.user_query_repository import SQLAlchemyUserQueryRepository
-from src.identity.repository.user_command_repository import SQLAlchemyUserCommandRepository
-from src.identity.repository.refresh_token_query_repository import SQLAlchemyRefreshTokenQueryRepository
-from src.identity.repository.refresh_token_command_repository import SQLAlchemyRefreshTokenCommandRepository
+from identity.infrastructure.repository.user_query_repository import SQLAlchemyUserQueryRepository
+from identity.infrastructure.repository.user_command_repository import SQLAlchemyUserCommandRepository
+from identity.infrastructure.repository.refresh_token_query_repository import SQLAlchemyRefreshTokenQueryRepository
+from identity.infrastructure.repository.refresh_token_command_repository import SQLAlchemyRefreshTokenCommandRepository
 
 
 class SQLAlchemyIdentityUnitOfWork:
