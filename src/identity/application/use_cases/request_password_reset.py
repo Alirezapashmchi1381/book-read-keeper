@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from typing import Callable
 
 from src.identity.application.dtos.request_password_reset_dto import RequestPasswordResetInputDto
 from src.identity.application.use_cases.constants import RESET_TOKEN_TTL_HOURS
@@ -13,13 +14,13 @@ from src.identity.domain.value_objects.email import Email
 
 @dataclass
 class RequestPasswordResetUseCase:
-    uow: IdentityUnitOfWork
+    uow_factory: Callable[[], IdentityUnitOfWork]
     password_hasher: PasswordHasher
     token_service: TokenService
     email_service: EmailService
 
     async def execute(self, dto: RequestPasswordResetInputDto) -> None:
-        async with self.uow as uow:
+        async with self.uow_factory() as uow:
             email = Email(dto.email)
             user = await uow.user_query.find_by_email(email)
 

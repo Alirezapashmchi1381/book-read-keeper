@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from typing import Callable
 
 from src.identity.application.dtos.auth_result_dto import AuthResultDto
 from src.identity.application.dtos.signup_dto import SignupInputDto
@@ -14,12 +15,12 @@ from src.identity.domain.value_objects.email import Email
 
 @dataclass
 class SignupUseCase:
-    uow: IdentityUnitOfWork
+    uow_factory: Callable[[], IdentityUnitOfWork]
     password_hasher: PasswordHasher
     token_service: TokenService
 
     async def execute(self, dto: SignupInputDto) -> AuthResultDto:
-        async with self.uow as uow:
+        async with self.uow_factory() as uow:
             email = Email(dto.email)
 
             if await uow.user_query.exists_by_email(email):

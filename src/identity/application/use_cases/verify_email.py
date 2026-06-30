@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Callable
 
 from src.identity.application.dtos.verify_email_dto import VerifyEmailInputDto
 from src.identity.domain.ports.password_hasher import PasswordHasher
@@ -9,11 +10,11 @@ from src.identity.domain.value_objects.user_id import UserId
 
 @dataclass
 class VerifyEmailUseCase:
-    uow: IdentityUnitOfWork
+    uow_factory: Callable[[], IdentityUnitOfWork]
     password_hasher: PasswordHasher
 
     async def execute(self, dto: VerifyEmailInputDto) -> None:
-        async with self.uow as uow:
+        async with self.uow_factory() as uow:
             token_hash = self.password_hasher.hash(dto.verification_token)
             verification_token = await uow.email_verification_token_query.find_by_token_hash(token_hash)
 

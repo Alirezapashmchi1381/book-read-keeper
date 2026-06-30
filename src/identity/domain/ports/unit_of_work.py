@@ -1,4 +1,4 @@
-from typing import Protocol
+from abc import ABC, abstractmethod
 
 from src.identity.domain.ports.email_verification_token_command_repository import EmailVerificationTokenCommandRepository
 from src.identity.domain.ports.email_verification_token_query_repository import EmailVerificationTokenQueryRepository
@@ -10,17 +10,41 @@ from src.identity.domain.ports.user_command_repository import UserCommandReposit
 from src.identity.domain.ports.user_query_repository import UserQueryRepository
 
 
-class IdentityUnitOfWork(Protocol):
-    user_query: UserQueryRepository
-    user_command: UserCommandRepository
-    refresh_token_query: RefreshTokenQueryRepository
-    refresh_token_command: RefreshTokenCommandRepository
-    password_reset_token_query: PasswordResetTokenQueryRepository
-    password_reset_token_command: PasswordResetTokenCommandRepository
-    email_verification_token_query: EmailVerificationTokenQueryRepository
-    email_verification_token_command: EmailVerificationTokenCommandRepository
+class IdentityUnitOfWork(ABC):
+    @property
+    @abstractmethod
+    def user_query(self) -> UserQueryRepository: ...
 
-    async def __aenter__(self) -> "IdentityUnitOfWork": ...
+    @property
+    @abstractmethod
+    def user_command(self) -> UserCommandRepository: ...
+
+    @property
+    @abstractmethod
+    def refresh_token_query(self) -> RefreshTokenQueryRepository: ...
+
+    @property
+    @abstractmethod
+    def refresh_token_command(self) -> RefreshTokenCommandRepository: ...
+
+    @property
+    @abstractmethod
+    def password_reset_token_query(self) -> PasswordResetTokenQueryRepository: ...
+
+    @property
+    @abstractmethod
+    def password_reset_token_command(self) -> PasswordResetTokenCommandRepository: ...
+
+    @property
+    @abstractmethod
+    def email_verification_token_query(self) -> EmailVerificationTokenQueryRepository: ...
+
+    @property
+    @abstractmethod
+    def email_verification_token_command(self) -> EmailVerificationTokenCommandRepository: ...
+
+    async def __aenter__(self) -> "IdentityUnitOfWork":
+        return self
 
     async def __aexit__(
         self,
@@ -29,6 +53,8 @@ class IdentityUnitOfWork(Protocol):
         exc_tb: object | None,
     ) -> None: ...
 
+    @abstractmethod
     async def commit(self) -> None: ...
 
+    @abstractmethod
     async def rollback(self) -> None: ...

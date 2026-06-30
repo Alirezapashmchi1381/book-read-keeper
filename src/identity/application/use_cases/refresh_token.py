@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from typing import Callable
 
 from src.identity.application.dtos.refresh_token_dto import RefreshTokenInputDto, RefreshTokenResultDto
 from src.identity.application.use_cases.constants import REFRESH_TOKEN_TTL_DAYS
@@ -11,12 +12,12 @@ from src.identity.domain.ports.unit_of_work import IdentityUnitOfWork
 
 @dataclass
 class RefreshTokenUseCase:
-    uow: IdentityUnitOfWork
+    uow_factory: Callable[[], IdentityUnitOfWork]
     password_hasher: PasswordHasher
     token_service: TokenService
 
     async def execute(self, dto: RefreshTokenInputDto) -> RefreshTokenResultDto:
-        async with self.uow as uow:
+        async with self.uow_factory() as uow:
             token_hash = self.password_hasher.hash(dto.refresh_token)
             token = await uow.refresh_token_query.find_by_token_hash(token_hash)
 

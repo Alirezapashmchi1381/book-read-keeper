@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from typing import Callable
 from uuid import UUID
 
 from src.identity.application.dtos.verify_email_dto import RequestEmailVerificationInputDto
@@ -14,13 +15,13 @@ from src.identity.domain.value_objects.user_id import UserId
 
 @dataclass
 class RequestEmailVerificationUseCase:
-    uow: IdentityUnitOfWork
+    uow_factory: Callable[[], IdentityUnitOfWork]
     password_hasher: PasswordHasher
     token_service: TokenService
     email_service: EmailService
 
     async def execute(self, dto: RequestEmailVerificationInputDto) -> None:
-        async with self.uow as uow:
+        async with self.uow_factory() as uow:
             user = await uow.user_query.find_by_id(UserId(UUID(dto.user_id)))
 
             if user is None:

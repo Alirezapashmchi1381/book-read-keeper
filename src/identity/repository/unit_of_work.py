@@ -6,6 +6,7 @@ from src.identity.domain.ports.password_reset_token_command_repository import Pa
 from src.identity.domain.ports.password_reset_token_query_repository import PasswordResetTokenQueryRepository
 from src.identity.domain.ports.refresh_token_command_repository import RefreshTokenCommandRepository
 from src.identity.domain.ports.refresh_token_query_repository import RefreshTokenQueryRepository
+from src.identity.domain.ports.unit_of_work import IdentityUnitOfWork
 from src.identity.domain.ports.user_command_repository import UserCommandRepository
 from src.identity.domain.ports.user_query_repository import UserQueryRepository
 from src.identity.repository.email_verification_token_command_repository import SQLAlchemyEmailVerificationTokenCommandRepository
@@ -18,7 +19,7 @@ from src.identity.repository.user_command_repository import SQLAlchemyUserComman
 from src.identity.repository.user_query_repository import SQLAlchemyUserQueryRepository
 
 
-class SQLAlchemyIdentityUnitOfWork:
+class SQLAlchemyIdentityUnitOfWork(IdentityUnitOfWork):
     """
     Opens one AsyncSession per `async with` block and lazily constructs
     repository instances so they all share the same session.

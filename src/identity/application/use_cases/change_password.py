@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Callable
 
 from src.identity.application.dtos.change_password_dto import ChangePasswordInputDto
 from src.identity.domain.ports.password_hasher import PasswordHasher
@@ -8,11 +9,11 @@ from src.identity.domain.value_objects.user_id import UserId
 
 @dataclass
 class ChangePasswordUseCase:
-    uow: IdentityUnitOfWork
+    uow_factory: Callable[[], IdentityUnitOfWork]
     password_hasher: PasswordHasher
 
     async def execute(self, dto: ChangePasswordInputDto) -> None:
-        async with self.uow as uow:
+        async with self.uow_factory() as uow:
             user = await uow.user_query.find_by_id(UserId(dto.user_id))
 
             if user is None:

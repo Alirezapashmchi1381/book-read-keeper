@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Callable
 
 from src.identity.application.dtos.reset_password_dto import ResetPasswordInputDto
 from src.identity.domain.ports.password_hasher import PasswordHasher
@@ -9,11 +10,11 @@ from src.identity.domain.value_objects.user_id import UserId
 
 @dataclass
 class ResetPasswordUseCase:
-    uow: IdentityUnitOfWork
+    uow_factory: Callable[[], IdentityUnitOfWork]
     password_hasher: PasswordHasher
 
     async def execute(self, dto: ResetPasswordInputDto) -> None:
-        async with self.uow as uow:
+        async with self.uow_factory() as uow:
             token_hash = self.password_hasher.hash(dto.reset_token)
             reset_token = await uow.password_reset_token_query.find_by_token_hash(token_hash)
 
