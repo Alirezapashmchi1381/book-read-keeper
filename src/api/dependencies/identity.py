@@ -15,6 +15,8 @@ from src.identity.application.use_cases.reset_password import ResetPasswordUseCa
 from src.identity.application.use_cases.signup import SignupUseCase
 from src.identity.application.use_cases.verify_email import VerifyEmailUseCase
 from src.identity.domain.ports.email_service import EmailService
+from src.identity.infrastructure.password_hasher import Argon2PasswordHasher
+from src.identity.infrastructure.token_service import RS256TokenService
 from identity.infrastructure.repository.unit_of_work import SQLAlchemyIdentityUnitOfWork
 
 
@@ -48,11 +50,26 @@ _session_factory: async_sessionmaker[AsyncSession] = async_sessionmaker(
 # Replace with your real implementations when you write them.
 # ------------------------------------------------------------------
 
-# from src.identity.infrastructure.password_hasher import ArgonPasswordHasher
-# from src.identity.infrastructure.token_service import JWTTokenService
+from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey, RSAPublicKey
+from cryptography.hazmat.primitives.serialization import load_pem_private_key, load_pem_public_key
+
 # from src.identity.infrastructure.email_service import SmtpEmailService
-# _password_hasher = ArgonPasswordHasher()
-# _token_service = JWTTokenService(secret=settings.jwt_secret)
+
+_password_hasher = Argon2PasswordHasher()
+
+# Load RSA keys from PEM files (paths via env / settings in production).
+# Generate with: openssl genrsa -out private.pem 2048
+#                openssl rsa -in private.pem -pubout -out public.pem
+with open("private.pem", "rb") as f:
+    _private_key: RSAPrivateKey = load_pem_private_key(f.read(), password=None)  # type: ignore[assignment]
+with open("public.pem", "rb") as f:
+    _public_key: RSAPublicKey = load_pem_public_key(f.read())  # type: ignore[assignment]
+
+_token_service = RS256TokenService(
+    private_key=_private_key,
+    public_key=_public_key,
+    issuer="book-read-keeper",
+)
 # _email_service = SmtpEmailService(...)
 
 # ------------------------------------------------------------------
@@ -70,23 +87,23 @@ def _uow_factory() -> SQLAlchemyIdentityUnitOfWork:
 def get_signup_use_case() -> SignupUseCase:
     return SignupUseCase(
         uow_factory=_uow_factory,
-        password_hasher=...,  # replace: _password_hasher
-        token_service=...,    # replace: _token_service
+        password_hasher=_password_hasher,
+        token_service=_token_service,
     )
 
 
 def get_login_use_case() -> LoginUseCase:
     return LoginUseCase(
         uow_factory=_uow_factory,
-        password_hasher=...,  # replace: _password_hasher
-        token_service=...,    # replace: _token_service
+        password_hasher=_password_hasher,
+        token_service=_token_service,
     )
 
 
 def get_logout_use_case() -> LogoutUseCase:
     return LogoutUseCase(
         uow_factory=_uow_factory,
-        password_hasher=...,  # replace: _password_hasher
+        password_hasher=_password_hasher,
     )
 
 
@@ -99,15 +116,15 @@ def get_logout_all_devices_use_case() -> LogoutAllDevicesUseCase:
 def get_refresh_token_use_case() -> RefreshTokenUseCase:
     return RefreshTokenUseCase(
         uow_factory=_uow_factory,
-        password_hasher=...,  # replace: _password_hasher
-        token_service=...,    # replace: _token_service
+        password_hasher=_password_hasher,
+        token_service=_token_service,
     )
 
 
 def get_change_password_use_case() -> ChangePasswordUseCase:
     return ChangePasswordUseCase(
         uow_factory=_uow_factory,
-        password_hasher=...,  # replace: _password_hasher
+        password_hasher=_password_hasher,
     )
 
 
@@ -120,8 +137,8 @@ def get_deactivate_account_use_case() -> DeactivateAccountUseCase:
 def get_request_password_reset_use_case() -> RequestPasswordResetUseCase:
     return RequestPasswordResetUseCase(
         uow_factory=_uow_factory,
-        password_hasher=...,  # replace: _password_hasher
-        token_service=...,    # replace: _token_service
+        password_hasher=_password_hasher,
+        token_service=_token_service,
         email_service=_email_service,
     )
 
@@ -129,15 +146,15 @@ def get_request_password_reset_use_case() -> RequestPasswordResetUseCase:
 def get_reset_password_use_case() -> ResetPasswordUseCase:
     return ResetPasswordUseCase(
         uow_factory=_uow_factory,
-        password_hasher=...,  # replace: _password_hasher
+        password_hasher=_password_hasher,
     )
 
 
 def get_request_email_verification_use_case() -> RequestEmailVerificationUseCase:
     return RequestEmailVerificationUseCase(
         uow_factory=_uow_factory,
-        password_hasher=...,  # replace: _password_hasher
-        token_service=...,    # replace: _token_service
+        password_hasher=_password_hasher,
+        token_service=_token_service,
         email_service=_email_service,
     )
 
@@ -145,7 +162,7 @@ def get_request_email_verification_use_case() -> RequestEmailVerificationUseCase
 def get_verify_email_use_case() -> VerifyEmailUseCase:
     return VerifyEmailUseCase(
         uow_factory=_uow_factory,
-        password_hasher=...,  # replace: _password_hasher
+        password_hasher=_password_hasher,
     )
 
 
