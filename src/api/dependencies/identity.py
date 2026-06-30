@@ -1,6 +1,9 @@
 from typing import Annotated
+from uuid import UUID
 
-from fastapi import Depends
+import jwt
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from src.identity.application.use_cases.change_password import ChangePasswordUseCase
@@ -52,6 +55,8 @@ _session_factory: async_sessionmaker[AsyncSession] = async_sessionmaker(
 
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey, RSAPublicKey
 from cryptography.hazmat.primitives.serialization import load_pem_private_key, load_pem_public_key
+
+_bearer = HTTPBearer()
 
 # from src.identity.infrastructure.email_service import SmtpEmailService
 
@@ -164,6 +169,27 @@ def get_verify_email_use_case() -> VerifyEmailUseCase:
         uow_factory=_uow_factory,
         password_hasher=_password_hasher,
     )
+
+
+# ------------------------------------------------------------------
+# Auth dependency -- extracts and validates the Bearer JWT
+# ------------------------------------------------------------------
+
+def get_current_user(
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(_bearer)],
+) -> UUID:
+    try:
+        payload = _token_service.decode_access_token(credentials.credentials)
+        return UUID(payload["sub"])
+    except (jwt.PyJWTError, KeyError, ValueError):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+
+CurrentUserDep = Annotated[UUID, Depends(get_current_user)]
 
 
 # ------------------------------------------------------------------
