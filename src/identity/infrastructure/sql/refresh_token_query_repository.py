@@ -5,8 +5,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.identity.domain.entities.refresh_token import RefreshToken
-from identity.infrastructure.repository.models.refresh_token_model import RefreshTokenModel
-from identity.infrastructure.repository.transformers.refresh_token_transformer import RefreshTokenTransformer
+from src.identity.infrastructure.sql.models.refresh_token_model import RefreshTokenModel
+from src.identity.infrastructure.sql.transformers.refresh_token_transformer import RefreshTokenTransformer
 
 
 class SQLAlchemyRefreshTokenQueryRepository:

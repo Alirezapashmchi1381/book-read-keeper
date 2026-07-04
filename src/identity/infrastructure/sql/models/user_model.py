@@ -5,7 +5,7 @@ from sqlalchemy import Boolean, DateTime, String
 from sqlalchemy.dialects.postgresql import UUID as PgUUID
 from sqlalchemy.orm import Mapped, mapped_column
 
-from identity.infrastructure.sql.models.base import Base
+from src.identity.infrastructure.sql.models.base import Base
 
 
 class UserModel(Base):

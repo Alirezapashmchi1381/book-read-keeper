@@ -5,8 +5,8 @@ from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.identity.domain.entities.email_verification_token import EmailVerificationToken
-from identity.infrastructure.repository.models.email_verification_token_model import EmailVerificationTokenModel
-from identity.infrastructure.repository.transformers.email_verification_token_transformer import EmailVerificationTokenTransformer
+from src.identity.infrastructure.sql.models.email_verification_token_model import EmailVerificationTokenModel
+from src.identity.infrastructure.sql.transformers.email_verification_token_transformer import EmailVerificationTokenTransformer
 
 
 class SQLAlchemyEmailVerificationTokenCommandRepository:

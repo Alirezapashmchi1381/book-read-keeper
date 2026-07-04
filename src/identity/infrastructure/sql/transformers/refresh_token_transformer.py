@@ -1,5 +1,5 @@
 from src.identity.domain.entities.refresh_token import RefreshToken
-from identity.infrastructure.sql.models.refresh_token_model import RefreshTokenModel
+from src.identity.infrastructure.sql.models.refresh_token_model import RefreshTokenModel
 
 
 class RefreshTokenTransformer:

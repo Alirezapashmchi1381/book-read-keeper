@@ -1,5 +1,5 @@
 from src.identity.domain.entities.password_reset_token import PasswordResetToken
-from identity.infrastructure.sql.models.password_reset_token_model import PasswordResetTokenModel
+from src.identity.infrastructure.sql.models.password_reset_token_model import PasswordResetTokenModel
 
 
 class PasswordResetTokenTransformer:

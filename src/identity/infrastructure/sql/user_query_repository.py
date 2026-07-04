@@ -6,8 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.identity.domain.entities.user import User
 from src.identity.domain.value_objects.email import Email
 from src.identity.domain.value_objects.user_id import UserId
-from identity.infrastructure.repository.models.user_model import UserModel
-from identity.infrastructure.repository.transformers.user_transformer import UserTransformer
+from src.identity.infrastructure.sql.models.user_model import UserModel
+from src.identity.infrastructure.sql.transformers.user_transformer import UserTransformer
 
 
 class SQLAlchemyUserQueryRepository:
