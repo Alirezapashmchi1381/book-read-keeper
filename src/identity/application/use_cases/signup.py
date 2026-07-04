@@ -22,10 +22,10 @@ class SignupUseCase:
         async with self.uow as uow:
             email = Email(dto.email)
 
-            if await uow.user_query.exists_by_email(email):
+            if await uow.users.query.exists_by_email(email):
                 raise ValueError("Email is already registered")
 
-            if await uow.user_query.exists_by_username(dto.username):
+            if await uow.users.query.exists_by_username(dto.username):
                 raise ValueError("Username is already taken")
 
             user = User.create(
@@ -33,7 +33,7 @@ class SignupUseCase:
                 username=dto.username,
                 password_hash=self.password_hasher.hash(dto.password),
             )
-            await uow.user_command.save(user)
+            await uow.users.command.save(user)
 
             raw_refresh_token = self.token_service.generate_refresh_token()
             refresh_token = RefreshToken.create(
@@ -41,7 +41,7 @@ class SignupUseCase:
                 token_hash=self.password_hasher.hash(raw_refresh_token),
                 expires_at=datetime.now() + timedelta(days=REFRESH_TOKEN_TTL_DAYS),
             )
-            await uow.refresh_token_command.save(refresh_token)
+            await uow.refresh_tokens.command.save(refresh_token)
 
             access_token = self.token_service.generate_access_token(user.id.value)
 

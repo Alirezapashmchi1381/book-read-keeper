@@ -21,7 +21,7 @@ class RequestEmailVerificationUseCase:
 
     async def execute(self, dto: RequestEmailVerificationInputDto) -> None:
         async with self.uow as uow:
-            user = await uow.user_query.find_by_id(UserId(UUID(dto.user_id)))
+            user = await uow.users.query.find_by_id(UserId(UUID(dto.user_id)))
 
             if user is None:
                 raise ValueError("User not found")
@@ -29,7 +29,7 @@ class RequestEmailVerificationUseCase:
             if user.is_verified:
                 return
 
-            await uow.email_verification_token_command.delete_all_for_user(user.id.value)
+            await uow.email_verification_tokens.command.delete_all_for_user(user.id.value)
 
             raw_token = self.token_service.generate_refresh_token()
             verification_token = EmailVerificationToken.create(
@@ -37,6 +37,6 @@ class RequestEmailVerificationUseCase:
                 token_hash=self.password_hasher.hash(raw_token),
                 expires_at=datetime.now() + timedelta(hours=VERIFICATION_TOKEN_TTL_HOURS),
             )
-            await uow.email_verification_token_command.save(verification_token)
+            await uow.email_verification_tokens.command.save(verification_token)
 
         await self.email_service.send_email_verification(user.email.address, raw_token)

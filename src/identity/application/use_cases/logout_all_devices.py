@@ -10,4 +10,4 @@ class LogoutAllDevicesUseCase:
 
     async def execute(self, dto: LogoutAllDevicesInputDto) -> None:
         async with self.uow as uow:
-            await uow.refresh_token_command.revoke_all_for_user(dto.user_id)
+            await uow.refresh_tokens.command.revoke_all_for_user(dto.user_id)

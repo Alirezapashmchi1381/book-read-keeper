@@ -4,7 +4,7 @@ from uuid import uuid4
 
 from src.identity.domain.value_objects.email import Email
 from src.identity.domain.value_objects.user_id import UserId
-
+from src.identity.domain.ports.password_hasher import PasswordHasher
 
 @dataclass
 class User():
@@ -32,12 +32,6 @@ class User():
         """Verify the user account."""
         self.is_verified = True
         self.updated_at = datetime.now()
-
-
-    def verify_password(self, password: str) -> bool:
-        """Verify if the provided password matches the stored password hash."""
-        # TODO: Implement password verification logic (e.g., using bcrypt or argon2)
-        return self.password_hash == password
 
     @classmethod
     def create(cls, email: Email, username: str, password_hash: str) -> "User":

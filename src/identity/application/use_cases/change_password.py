@@ -13,7 +13,7 @@ class ChangePasswordUseCase:
 
     async def execute(self, dto: ChangePasswordInputDto) -> None:
         async with self.uow as uow:
-            user = await uow.user_query.find_by_id(UserId(dto.user_id))
+            user = await uow.users.query.find_by_id(UserId(dto.user_id))
 
             if user is None:
                 raise ValueError("User not found")
@@ -22,7 +22,7 @@ class ChangePasswordUseCase:
                 raise ValueError("Current password is incorrect")
 
             user.password_hash = self.password_hasher.hash(dto.new_password)
-            await uow.user_command.save(user)
+            await uow.users.command.save(user)
 
             # Force re-login on all devices after a password change
-            await uow.refresh_token_command.revoke_all_for_user(dto.user_id)
+            await uow.refresh_tokens.command.revoke_all_for_user(dto.user_id)

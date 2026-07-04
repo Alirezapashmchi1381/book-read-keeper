@@ -15,16 +15,16 @@ class VerifyEmailUseCase:
     async def execute(self, dto: VerifyEmailInputDto) -> None:
         async with self.uow as uow:
             token_hash = self.password_hasher.hash(dto.verification_token)
-            verification_token = await uow.email_verification_token_query.find_by_token_hash(token_hash)
+            verification_token = await uow.email_verification_tokens.query.find_by_token_hash(token_hash)
 
             if verification_token is None or verification_token.is_expired(datetime.now()):
                 raise ValueError("Invalid or expired verification token")
 
-            user = await uow.user_query.find_by_id(UserId(verification_token.user_id))
+            user = await uow.users.query.find_by_id(UserId(verification_token.user_id))
             if user is None:
                 raise ValueError("User not found")
 
             user.verify()
-            await uow.user_command.save(user)
+            await uow.users.command.save(user)
 
-            await uow.email_verification_token_command.delete(verification_token.id)
+            await uow.email_verification_tokens.command.delete(verification_token.id)

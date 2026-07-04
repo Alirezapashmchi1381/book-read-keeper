@@ -5,11 +5,11 @@ from sqlalchemy import DateTime, ForeignKey, String
 from sqlalchemy.dialects.postgresql import UUID as PgUUID
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.identity.repository.models.base import Base
+from identity.infrastructure.sql.models.base import Base
 
 
-class EmailVerificationTokenModel(Base):
-    __tablename__ = "email_verification_tokens"
+class PasswordResetTokenModel(Base):
+    __tablename__ = "password_reset_tokens"
 
     id: Mapped[UUID] = mapped_column(PgUUID(as_uuid=True), primary_key=True)
     user_id: Mapped[UUID] = mapped_column(

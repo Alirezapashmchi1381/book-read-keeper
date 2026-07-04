@@ -14,10 +14,10 @@ class LogoutUseCase:
     async def execute(self, dto: LogoutInputDto) -> None:
         async with self.uow as uow:
             token_hash = self.password_hasher.hash(dto.refresh_token)
-            token = await uow.refresh_token_query.find_by_token_hash(token_hash)
+            token = await uow.refresh_tokens.query.find_by_token_hash(token_hash)
 
             if token is None or not token.is_valid(datetime.now()):
                 return
 
             token.revoke()
-            await uow.refresh_token_command.revoke(token.id)
+            await uow.refresh_tokens.command.revoke(token.id)

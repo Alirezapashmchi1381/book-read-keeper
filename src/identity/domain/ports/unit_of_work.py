@@ -10,15 +10,31 @@ from src.identity.domain.ports.user_command_repository import UserCommandReposit
 from src.identity.domain.ports.user_query_repository import UserQueryRepository
 
 
+class UserUoW(Protocol):
+    query: UserQueryRepository
+    command: UserCommandRepository
+
+
+class RefreshTokenUoW(Protocol):
+    query: RefreshTokenQueryRepository
+    command: RefreshTokenCommandRepository
+
+
+class EmailVerificationTokenUoW(Protocol):
+    query: EmailVerificationTokenQueryRepository
+    command: EmailVerificationTokenCommandRepository
+
+
+class PasswordResetTokenUoW(Protocol):
+    query: PasswordResetTokenQueryRepository
+    command: PasswordResetTokenCommandRepository
+
+
 class IdentityUnitOfWork(Protocol):
-    user_query: UserQueryRepository
-    user_command: UserCommandRepository
-    refresh_token_query: RefreshTokenQueryRepository
-    refresh_token_command: RefreshTokenCommandRepository
-    password_reset_token_query: PasswordResetTokenQueryRepository
-    password_reset_token_command: PasswordResetTokenCommandRepository
-    email_verification_token_query: EmailVerificationTokenQueryRepository
-    email_verification_token_command: EmailVerificationTokenCommandRepository
+    users: UserUoW
+    refresh_tokens: RefreshTokenUoW
+    email_verification_tokens: EmailVerificationTokenUoW
+    password_reset_tokens: PasswordResetTokenUoW
 
     async def __aenter__(self) -> "IdentityUnitOfWork": ...
 

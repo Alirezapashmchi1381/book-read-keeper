@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from src.identity.application.use_cases.login import LoginUseCase
 from src.identity.application.use_cases.signup import SignupUseCase
-from src.identity.repository.unit_of_work import SQLAlchemyIdentityUnitOfWork
+from identity.infrastructure.sql.unit_of_work import SQLAlchemyIdentityUnitOfWork
 
 # ------------------------------------------------------------------
 # Infrastructure singletons -- created once at import time.

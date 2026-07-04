@@ -21,14 +21,14 @@ class RequestPasswordResetUseCase:
     async def execute(self, dto: RequestPasswordResetInputDto) -> None:
         async with self.uow as uow:
             email = Email(dto.email)
-            user = await uow.user_query.find_by_email(email)
+            user = await uow.users.query.find_by_email(email)
 
             # Silent no-op: avoids leaking whether an email is registered
             if user is None:
                 return
 
             # Invalidate any existing reset tokens before issuing a new one
-            await uow.password_reset_token_command.delete_all_for_user(user.id.value)
+            await uow.password_reset_tokens.command.delete_all_for_user(user.id.value)
 
             raw_token = self.token_service.generate_refresh_token()
             reset_token = PasswordResetToken.create(
@@ -36,6 +36,6 @@ class RequestPasswordResetUseCase:
                 token_hash=self.password_hasher.hash(raw_token),
                 expires_at=datetime.now() + timedelta(hours=RESET_TOKEN_TTL_HOURS),
             )
-            await uow.password_reset_token_command.save(reset_token)
+            await uow.password_reset_tokens.command.save(reset_token)
 
         await self.email_service.send_password_reset(user.email.address, raw_token)

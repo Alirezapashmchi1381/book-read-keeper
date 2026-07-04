@@ -11,12 +11,12 @@ class DeactivateAccountUseCase:
 
     async def execute(self, dto: DeactivateAccountInputDto) -> None:
         async with self.uow as uow:
-            user = await uow.user_query.find_by_id(UserId(dto.user_id))
+            user = await uow.users.query.find_by_id(UserId(dto.user_id))
 
             if user is None:
                 raise ValueError("User not found")
 
             user.deactivate()
-            await uow.user_command.save(user)
+            await uow.users.command.save(user)
 
-            await uow.refresh_token_command.revoke_all_for_user(dto.user_id)
+            await uow.refresh_tokens.command.revoke_all_for_user(dto.user_id)
