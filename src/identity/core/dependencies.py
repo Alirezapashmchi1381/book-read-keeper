@@ -1,6 +1,10 @@
 from typing import Annotated
+from uuid import UUID
 
-from fastapi import Depends
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+
+
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from src.core.config import Settings, get_settings
@@ -22,6 +26,7 @@ from src.identity.infrastructure.services.jwt_token_service import JWTTokenServi
 from src.identity.infrastructure.services.secrets_generator import SecretsGenerator
 from src.identity.infrastructure.services.stub_email_service import StubEmailService
 from src.identity.infrastructure.sql.unit_of_work import SQLAlchemyIdentityUnitOfWork
+from src.identity.infrastructure.services.jwt_token_service import JWTTokenService
 
 # ---------------------------------------------------------------------------
 # Infrastructure layer
@@ -178,3 +183,27 @@ def get_reset_password_use_case(
     token_hasher: TokenHasherDep,
 ) -> ResetPasswordUseCase:
     return ResetPasswordUseCase(uow=uow, password_hasher=hasher, token_hasher=token_hasher)
+
+
+_bearer = HTTPBearer()
+
+
+def _get_token_service(settings: Settings = Depends(get_settings)) -> JWTTokenService:
+    return JWTTokenService(
+        secret=settings.jwt_secret,
+        algorithm=settings.jwt_algorithm,
+        expire_minutes=settings.jwt_access_token_expire_minutes,
+    )
+
+
+async def get_current_user_id(
+    credentials: HTTPAuthorizationCredentials = Depends(_bearer),
+    token_service: JWTTokenService = Depends(_get_token_service),
+) -> UUID:
+    try:
+        return token_service.verify_access_token(credentials.credentials)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired access token",
+        )

@@ -5,11 +5,12 @@ from src.identity.application.dtos.deactivate_account_dto import DeactivateAccou
 from src.identity.application.use_cases.change_password import ChangePasswordUseCase
 from src.identity.application.use_cases.deactivate_account import DeactivateAccountUseCase
 from src.identity.presentation.http.api.v1.endpoints.account.models import ChangePasswordRequest
-from src.identity.presentation.http.dependencies import (
+from src.identity.core.dependencies import (
     get_change_password_use_case,
-    get_current_user_id,
     get_deactivate_account_use_case,
+    get_current_user_id
 )
+
 from src.identity.presentation.http.response import ApiResponse, make_response
 
 router = APIRouter(prefix="/account", tags=["account"])

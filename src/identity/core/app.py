@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 
+from src.identity.presentation.http.middleware.register_exception_handler import register_exception_handlers
 from src.core.config import get_settings
 from src.core.lifespan import lifespan
+from src.identity.presentation.http.api.v1.router import v1_router as identity_v1_router
 from src.identity.domain.exceptions import (
     AuthenticationError,
     ConflictError,
@@ -19,26 +21,27 @@ from src.identity.presentation.http.exception_handlers import (
     value_error_handler,
 )
 from src.identity.presentation.http.middleware.cors import add_cors
-from src.identity.core.app import create_identity_app
 
-def create_app() -> FastAPI:
+
+def create_identity_app() -> FastAPI:
     settings = get_settings()
 
-    main_app = FastAPI(
-        title="Book Read Keeper",
+    app = FastAPI(
+        title="Book Read Keeper identity",
         version="1.0.0",
         debug=settings.debug,
         lifespan=lifespan,
     )
 
-    add_cors(main_app, settings.cors_origins)
+    add_cors(app, settings.cors_origins)
+    register_exception_handlers(app)
 
-    main_app.mount("/identity", create_identity_app())
     # Bounded contexts
+    app.include_router(identity_v1_router, prefix="/api")
     # app.include_router(library_v1_router, prefix="/api")   # add when ready
     # app.include_router(reader_v1_router, prefix="/api")
 
-    return main_app
+    return app
 
 
-app = create_app()
+app = create_identity_app()

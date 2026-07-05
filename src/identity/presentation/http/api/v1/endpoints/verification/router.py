@@ -15,12 +15,12 @@ from src.identity.presentation.http.api.v1.endpoints.verification.models import 
     ResetPasswordRequest,
     VerifyEmailRequest,
 )
-from src.identity.presentation.http.dependencies import (
-    get_current_user_id,
+from src.identity.core.dependencies import (
     get_request_email_verification_use_case,
     get_request_password_reset_use_case,
     get_reset_password_use_case,
     get_verify_email_use_case,
+    get_current_user_id
 )
 from src.identity.presentation.http.response import ApiResponse, make_response
 

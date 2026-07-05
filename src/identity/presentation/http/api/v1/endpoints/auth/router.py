@@ -17,13 +17,13 @@ from src.identity.presentation.http.api.v1.endpoints.auth.models import (
     RefreshTokenResponse,
     SignupRequest,
 )
-from src.identity.presentation.http.dependencies import (
-    get_current_user_id,
+from src.identity.core.dependencies import (
     get_login_use_case,
     get_logout_all_devices_use_case,
     get_logout_use_case,
     get_refresh_token_use_case,
     get_signup_use_case,
+    get_current_user_id
 )
 from src.identity.presentation.http.response import ApiResponse, make_response
 
