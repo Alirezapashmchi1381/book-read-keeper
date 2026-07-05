@@ -1,12 +1,12 @@
 from typing import Optional, Protocol
+from uuid import UUID
 
 from src.identity.domain.entities.user import User
 from src.identity.domain.value_objects.email import Email
-from src.identity.domain.value_objects.user_id import UserId
 
 
 class UserQueryRepository(Protocol):
-    async def find_by_id(self, user_id: UserId) -> Optional[User]: ...
+    async def find_by_id(self, user_id: UUID) -> Optional[User]: ...
 
     async def find_by_email(self, email: Email) -> Optional[User]: ...
 

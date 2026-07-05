@@ -6,8 +6,8 @@ from tests.identity.application.use_cases.factories import make_user # type: ign
 
 
 @pytest.fixture
-def use_case(fake_uow, fake_hasher, fake_tokens) -> LoginUseCase:
-    return LoginUseCase(uow=fake_uow, password_hasher=fake_hasher, token_service=fake_tokens)
+def use_case(fake_uow, fake_hasher, fake_token_hasher, fake_tokens) -> LoginUseCase:
+    return LoginUseCase(uow=fake_uow, password_hasher=fake_hasher, token_hasher=fake_token_hasher, token_service=fake_tokens)
 
 
 @pytest.fixture
@@ -39,7 +39,7 @@ async def test_login_revokes_old_tokens_and_saves_new(use_case, fake_uow, dto, a
 
     await use_case.execute(dto)
 
-    fake_uow.refresh_tokens.command.revoke_all_for_user.assert_called_once_with(active_user.id.value)
+    fake_uow.refresh_tokens.command.revoke_all_for_user.assert_called_once_with(active_user.id)
     fake_uow.refresh_tokens.command.save.assert_called_once()
 
 

@@ -6,10 +6,10 @@ from tests.identity.application.use_cases.factories import make_user
 
 
 @pytest.fixture
-def use_case(fake_uow, fake_hasher, fake_tokens, fake_email_service) -> RequestPasswordResetUseCase:
+def use_case(fake_uow, fake_token_hasher, fake_tokens, fake_email_service) -> RequestPasswordResetUseCase:
     return RequestPasswordResetUseCase(
         uow=fake_uow,
-        password_hasher=fake_hasher,
+        token_hasher=fake_token_hasher,
         token_service=fake_tokens,
         email_service=fake_email_service,
     )
@@ -39,7 +39,7 @@ async def test_deletes_old_tokens_before_saving_new(use_case, fake_uow, user, dt
 
     await use_case.execute(dto)
 
-    fake_uow.password_reset_tokens.command.delete_all_for_user.assert_called_once_with(user.id.value)
+    fake_uow.password_reset_tokens.command.delete_all_for_user.assert_called_once_with(user.id)
     fake_uow.password_reset_tokens.command.save.assert_called_once()
 
 

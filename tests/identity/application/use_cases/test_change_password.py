@@ -18,7 +18,7 @@ def user():
 @pytest.fixture
 def dto(user) -> ChangePasswordInputDto:
     return ChangePasswordInputDto(
-        user_id=user.id.value,
+        user_id=user.id,
         current_password="old-password",
         new_password="new-password",
     )

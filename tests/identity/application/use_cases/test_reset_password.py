@@ -10,8 +10,8 @@ from tests.identity.application.use_cases.factories import (
 
 
 @pytest.fixture
-def use_case(fake_uow, fake_hasher) -> ResetPasswordUseCase:
-    return ResetPasswordUseCase(uow=fake_uow, password_hasher=fake_hasher)
+def use_case(fake_uow, fake_hasher, fake_token_hasher) -> ResetPasswordUseCase:
+    return ResetPasswordUseCase(uow=fake_uow, password_hasher=fake_hasher, token_hasher=fake_token_hasher)
 
 
 @pytest.fixture
@@ -21,7 +21,7 @@ def user():
 
 @pytest.fixture
 def reset_token(user):
-    return make_password_reset_token(user_id=user.id.value, raw_token="fake-reset-token")
+    return make_password_reset_token(user_id=user.id, raw_token="fake-reset-token")
 
 
 @pytest.fixture

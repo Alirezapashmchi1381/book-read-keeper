@@ -6,7 +6,7 @@ from src.identity.application.dtos.verify_email_dto import RequestEmailVerificat
 from src.identity.application.use_cases.constants import VERIFICATION_TOKEN_TTL_HOURS
 from src.identity.domain.entities.email_verification_token import EmailVerificationToken
 from src.identity.domain.ports.email_service import EmailService
-from src.identity.domain.ports.password_hasher import PasswordHasher
+from src.identity.domain.ports.token_hasher import TokenHasher
 from src.identity.domain.ports.token_service import TokenService
 from src.identity.domain.ports.unit_of_work import IdentityUnitOfWork
 
@@ -14,7 +14,7 @@ from src.identity.domain.ports.unit_of_work import IdentityUnitOfWork
 @dataclass
 class RequestEmailVerificationUseCase:
     uow: IdentityUnitOfWork
-    password_hasher: PasswordHasher
+    token_hasher: TokenHasher
     token_service: TokenService
     email_service: EmailService
 
@@ -33,7 +33,7 @@ class RequestEmailVerificationUseCase:
             raw_token = self.token_service.generate_refresh_token()
             verification_token = EmailVerificationToken.create(
                 user_id=user.id,
-                token_hash=self.password_hasher.hash(raw_token),
+                token_hash=self.token_hasher.hash(raw_token),
                 expires_at=datetime.now() + timedelta(hours=VERIFICATION_TOKEN_TTL_HOURS),
             )
             await uow.email_verification_tokens.command.save(verification_token)

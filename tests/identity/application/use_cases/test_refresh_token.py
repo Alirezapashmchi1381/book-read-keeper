@@ -6,8 +6,8 @@ from tests.identity.application.use_cases.factories import make_refresh_token
 
 
 @pytest.fixture
-def use_case(fake_uow, fake_hasher, fake_tokens) -> RefreshTokenUseCase:
-    return RefreshTokenUseCase(uow=fake_uow, password_hasher=fake_hasher, token_service=fake_tokens)
+def use_case(fake_uow, fake_token_hasher, fake_tokens) -> RefreshTokenUseCase:
+    return RefreshTokenUseCase(uow=fake_uow, token_hasher=fake_token_hasher, token_service=fake_tokens)
 
 
 @pytest.fixture

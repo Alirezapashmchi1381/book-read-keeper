@@ -48,6 +48,14 @@ class FakePasswordHasher:
         return hashed == f"hashed:{plain}"
 
 
+class FakeTokenHasher:
+    def hash(self, token: str) -> str:
+        return f"token:{token}"
+
+    def verify(self, token: str, hashed: str) -> bool:
+        return hashed == f"token:{token}"
+
+
 class FakeTokenService:
     def generate_access_token(self, user_id) -> str:
         return "fake-access-token"
@@ -75,7 +83,7 @@ def make_refresh_token(
     expired: bool = False,
     revoked: bool = False,
 ) -> RefreshToken:
-    hasher = FakePasswordHasher()
+    hasher = FakeTokenHasher()
     expires_at = datetime.now() + (timedelta(seconds=-1) if expired else timedelta(days=7))
     token = RefreshToken.create(
         user_id=user_id or uuid4(),
@@ -93,7 +101,7 @@ def make_email_verification_token(
     raw_token: str = "fake-verification-token",
     expired: bool = False,
 ) -> EmailVerificationToken:
-    hasher = FakePasswordHasher()
+    hasher = FakeTokenHasher()
     expires_at = datetime.now() + (timedelta(seconds=-1) if expired else timedelta(hours=24))
     return EmailVerificationToken.create(
         user_id=user_id or uuid4(),
@@ -108,7 +116,7 @@ def make_password_reset_token(
     raw_token: str = "fake-reset-token",
     expired: bool = False,
 ) -> PasswordResetToken:
-    hasher = FakePasswordHasher()
+    hasher = FakeTokenHasher()
     expires_at = datetime.now() + (timedelta(seconds=-1) if expired else timedelta(hours=1))
     return PasswordResetToken.create(
         user_id=user_id or uuid4(),

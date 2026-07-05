@@ -6,10 +6,10 @@ from tests.identity.application.use_cases.factories import make_user
 
 
 @pytest.fixture
-def use_case(fake_uow, fake_hasher, fake_tokens, fake_email_service) -> RequestEmailVerificationUseCase:
+def use_case(fake_uow, fake_token_hasher, fake_tokens, fake_email_service) -> RequestEmailVerificationUseCase:
     return RequestEmailVerificationUseCase(
         uow=fake_uow,
-        password_hasher=fake_hasher,
+        token_hasher=fake_token_hasher,
         token_service=fake_tokens,
         email_service=fake_email_service,
     )
@@ -22,7 +22,7 @@ def unverified_user():
 
 @pytest.fixture
 def dto(unverified_user) -> RequestEmailVerificationInputDto:
-    return RequestEmailVerificationInputDto(user_id=str(unverified_user.id.value))
+    return RequestEmailVerificationInputDto(user_id=str(unverified_user.id))
 
 
 async def test_sends_verification_email(use_case, fake_uow, fake_email_service, unverified_user, dto):
@@ -40,7 +40,7 @@ async def test_deletes_old_tokens_before_saving_new(use_case, fake_uow, unverifi
     await use_case.execute(dto)
 
     fake_uow.email_verification_tokens.command.delete_all_for_user.assert_called_once_with(
-        unverified_user.id.value
+        unverified_user.id
     )
     fake_uow.email_verification_tokens.command.save.assert_called_once()
 

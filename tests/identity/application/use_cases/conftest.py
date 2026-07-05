@@ -4,6 +4,7 @@ from tests.identity.application.use_cases.factories import ( # type: ignore
     FakeEmailService,
     FakeIdentityUnitOfWork,
     FakePasswordHasher,
+    FakeTokenHasher,
     FakeTokenService,
 )
 
@@ -16,6 +17,11 @@ def fake_uow() -> FakeIdentityUnitOfWork:
 @pytest.fixture
 def fake_hasher() -> FakePasswordHasher:
     return FakePasswordHasher()
+
+
+@pytest.fixture
+def fake_token_hasher() -> FakeTokenHasher:
+    return FakeTokenHasher()
 
 
 @pytest.fixture

@@ -17,7 +17,7 @@ def user():
 
 @pytest.fixture
 def dto(user) -> DeactivateAccountInputDto:
-    return DeactivateAccountInputDto(user_id=user.id.value)
+    return DeactivateAccountInputDto(user_id=user.id)
 
 
 async def test_deactivate_account_marks_user_inactive(use_case, fake_uow, user, dto):

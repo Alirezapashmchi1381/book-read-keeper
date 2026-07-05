@@ -2,18 +2,18 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from src.identity.application.dtos.verify_email_dto import VerifyEmailInputDto
-from src.identity.domain.ports.password_hasher import PasswordHasher
+from src.identity.domain.ports.token_hasher import TokenHasher
 from src.identity.domain.ports.unit_of_work import IdentityUnitOfWork
 
 
 @dataclass
 class VerifyEmailUseCase:
     uow: IdentityUnitOfWork
-    password_hasher: PasswordHasher
+    token_hasher: TokenHasher
 
     async def execute(self, dto: VerifyEmailInputDto) -> None:
         async with self.uow as uow:
-            token_hash = self.password_hasher.hash(dto.verification_token)
+            token_hash = self.token_hasher.hash(dto.verification_token)
             verification_token = await uow.email_verification_tokens.query.find_by_token_hash(token_hash)
 
             if verification_token is None or verification_token.is_expired(datetime.now()):

@@ -17,6 +17,7 @@ from src.identity.application.use_cases.reset_password import ResetPasswordUseCa
 from src.identity.application.use_cases.signup import SignupUseCase
 from src.identity.application.use_cases.verify_email import VerifyEmailUseCase
 from src.identity.infrastructure.services.bcrypt_password_hasher import BcryptPasswordHasher
+from src.identity.infrastructure.services.hmac_token_hasher import HMACTokenHasher
 from src.identity.infrastructure.services.jwt_token_service import JWTTokenService
 from src.identity.infrastructure.services.stub_email_service import StubEmailService
 from src.identity.infrastructure.sql.unit_of_work import SQLAlchemyIdentityUnitOfWork
@@ -35,6 +36,10 @@ def get_password_hasher() -> BcryptPasswordHasher:
     return BcryptPasswordHasher()
 
 
+def get_token_hasher(settings: Settings = Depends(get_settings)) -> HMACTokenHasher:
+    return HMACTokenHasher(secret=settings.token_secret)
+
+
 def get_token_service(settings: Settings = Depends(get_settings)) -> JWTTokenService:
     return JWTTokenService(
         secret=settings.jwt_secret,
@@ -50,6 +55,7 @@ def get_email_service() -> StubEmailService:
 # Annotated aliases — use these in router signatures for brevity
 IdentityUoWDep = Annotated[SQLAlchemyIdentityUnitOfWork, Depends(get_identity_uow)]
 PasswordHasherDep = Annotated[BcryptPasswordHasher, Depends(get_password_hasher)]
+TokenHasherDep = Annotated[HMACTokenHasher, Depends(get_token_hasher)]
 TokenServiceDep = Annotated[JWTTokenService, Depends(get_token_service)]
 EmailServiceDep = Annotated[StubEmailService, Depends(get_email_service)]
 
@@ -60,24 +66,26 @@ EmailServiceDep = Annotated[StubEmailService, Depends(get_email_service)]
 def get_signup_use_case(
     uow: IdentityUoWDep,
     hasher: PasswordHasherDep,
+    token_hasher: TokenHasherDep,
     tokens: TokenServiceDep,
 ) -> SignupUseCase:
-    return SignupUseCase(uow=uow, password_hasher=hasher, token_service=tokens)
+    return SignupUseCase(uow=uow, password_hasher=hasher, token_hasher=token_hasher, token_service=tokens)
 
 
 def get_login_use_case(
     uow: IdentityUoWDep,
     hasher: PasswordHasherDep,
+    token_hasher: TokenHasherDep,
     tokens: TokenServiceDep,
 ) -> LoginUseCase:
-    return LoginUseCase(uow=uow, password_hasher=hasher, token_service=tokens)
+    return LoginUseCase(uow=uow, password_hasher=hasher, token_hasher=token_hasher, token_service=tokens)
 
 
 def get_logout_use_case(
     uow: IdentityUoWDep,
-    hasher: PasswordHasherDep,
+    token_hasher: TokenHasherDep,
 ) -> LogoutUseCase:
-    return LogoutUseCase(uow=uow, password_hasher=hasher)
+    return LogoutUseCase(uow=uow, token_hasher=token_hasher)
 
 
 def get_logout_all_devices_use_case(uow: IdentityUoWDep) -> LogoutAllDevicesUseCase:
@@ -86,10 +94,10 @@ def get_logout_all_devices_use_case(uow: IdentityUoWDep) -> LogoutAllDevicesUseC
 
 def get_refresh_token_use_case(
     uow: IdentityUoWDep,
-    hasher: PasswordHasherDep,
+    token_hasher: TokenHasherDep,
     tokens: TokenServiceDep,
 ) -> RefreshTokenUseCase:
-    return RefreshTokenUseCase(uow=uow, password_hasher=hasher, token_service=tokens)
+    return RefreshTokenUseCase(uow=uow, token_hasher=token_hasher, token_service=tokens)
 
 
 def get_change_password_use_case(
@@ -105,35 +113,36 @@ def get_deactivate_account_use_case(uow: IdentityUoWDep) -> DeactivateAccountUse
 
 def get_request_email_verification_use_case(
     uow: IdentityUoWDep,
-    hasher: PasswordHasherDep,
+    token_hasher: TokenHasherDep,
     tokens: TokenServiceDep,
     email: EmailServiceDep,
 ) -> RequestEmailVerificationUseCase:
     return RequestEmailVerificationUseCase(
-        uow=uow, password_hasher=hasher, token_service=tokens, email_service=email
+        uow=uow, token_hasher=token_hasher, token_service=tokens, email_service=email
     )
 
 
 def get_verify_email_use_case(
     uow: IdentityUoWDep,
-    hasher: PasswordHasherDep,
+    token_hasher: TokenHasherDep,
 ) -> VerifyEmailUseCase:
-    return VerifyEmailUseCase(uow=uow, password_hasher=hasher)
+    return VerifyEmailUseCase(uow=uow, token_hasher=token_hasher)
 
 
 def get_request_password_reset_use_case(
     uow: IdentityUoWDep,
-    hasher: PasswordHasherDep,
+    token_hasher: TokenHasherDep,
     tokens: TokenServiceDep,
     email: EmailServiceDep,
 ) -> RequestPasswordResetUseCase:
     return RequestPasswordResetUseCase(
-        uow=uow, password_hasher=hasher, token_service=tokens, email_service=email
+        uow=uow, token_hasher=token_hasher, token_service=tokens, email_service=email
     )
 
 
 def get_reset_password_use_case(
     uow: IdentityUoWDep,
     hasher: PasswordHasherDep,
+    token_hasher: TokenHasherDep,
 ) -> ResetPasswordUseCase:
-    return ResetPasswordUseCase(uow=uow, password_hasher=hasher)
+    return ResetPasswordUseCase(uow=uow, password_hasher=hasher, token_hasher=token_hasher)

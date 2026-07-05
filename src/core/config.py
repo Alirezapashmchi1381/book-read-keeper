@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_access_token_expire_minutes: int = 30
 
+    # Opaque token hashing (refresh / verification / reset tokens)
+    token_secret: str = "change-token-secret-in-production"
+
     # CORS
     cors_origins: list[str] = ["*"]
 

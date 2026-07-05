@@ -6,8 +6,8 @@ from tests.identity.application.use_cases.factories import make_email_verificati
 
 
 @pytest.fixture
-def use_case(fake_uow, fake_hasher) -> VerifyEmailUseCase:
-    return VerifyEmailUseCase(uow=fake_uow, password_hasher=fake_hasher)
+def use_case(fake_uow, fake_token_hasher) -> VerifyEmailUseCase:
+    return VerifyEmailUseCase(uow=fake_uow, token_hasher=fake_token_hasher)
 
 
 @pytest.fixture
@@ -17,7 +17,7 @@ def user():
 
 @pytest.fixture
 def verification_token(user):
-    return make_email_verification_token(user_id=user.id.value, raw_token="fake-verification-token")
+    return make_email_verification_token(user_id=user.id, raw_token="fake-verification-token")
 
 
 @pytest.fixture
