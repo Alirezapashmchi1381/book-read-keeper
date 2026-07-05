@@ -82,7 +82,7 @@ def get_signup_use_case(
     secrets: SecretGeneratorDep,
 ) -> SignupUseCase:
     return SignupUseCase(
-        uow=uow,
+        uow=uow, # type: ignore
         password_hasher=hasher,
         token_hasher=token_hasher,
         token_service=tokens,
@@ -98,7 +98,7 @@ def get_login_use_case(
     secrets: SecretGeneratorDep,
 ) -> LoginUseCase:
     return LoginUseCase(
-        uow=uow,
+        uow=uow, # type: ignore
         password_hasher=hasher,
         token_hasher=token_hasher,
         token_service=tokens,
@@ -110,11 +110,11 @@ def get_logout_use_case(
     uow: IdentityUoWDep,
     token_hasher: TokenHasherDep,
 ) -> LogoutUseCase:
-    return LogoutUseCase(uow=uow, token_hasher=token_hasher)
+    return LogoutUseCase(uow=uow, token_hasher=token_hasher) # type: ignore
 
 
 def get_logout_all_devices_use_case(uow: IdentityUoWDep) -> LogoutAllDevicesUseCase:
-    return LogoutAllDevicesUseCase(uow=uow)
+    return LogoutAllDevicesUseCase(uow=uow) # type: ignore
 
 
 def get_refresh_token_use_case(
@@ -124,7 +124,7 @@ def get_refresh_token_use_case(
     secrets: SecretGeneratorDep,
 ) -> RefreshTokenUseCase:
     return RefreshTokenUseCase(
-        uow=uow,
+        uow=uow, # type: ignore
         token_hasher=token_hasher,
         token_service=tokens,
         secret_generator=secrets,
@@ -135,11 +135,11 @@ def get_change_password_use_case(
     uow: IdentityUoWDep,
     hasher: PasswordHasherDep,
 ) -> ChangePasswordUseCase:
-    return ChangePasswordUseCase(uow=uow, password_hasher=hasher)
+    return ChangePasswordUseCase(uow=uow, password_hasher=hasher) # type: ignore
 
 
 def get_deactivate_account_use_case(uow: IdentityUoWDep) -> DeactivateAccountUseCase:
-    return DeactivateAccountUseCase(uow=uow)
+    return DeactivateAccountUseCase(uow=uow) # type: ignore 
 
 
 def get_request_email_verification_use_case(
@@ -149,7 +149,7 @@ def get_request_email_verification_use_case(
     email: EmailServiceDep,
 ) -> RequestEmailVerificationUseCase:
     return RequestEmailVerificationUseCase(
-        uow=uow,
+        uow=uow, # type: ignore
         token_hasher=token_hasher,
         secret_generator=secrets,
         email_service=email,
@@ -160,7 +160,7 @@ def get_verify_email_use_case(
     uow: IdentityUoWDep,
     token_hasher: TokenHasherDep,
 ) -> VerifyEmailUseCase:
-    return VerifyEmailUseCase(uow=uow, token_hasher=token_hasher)
+    return VerifyEmailUseCase(uow=uow, token_hasher=token_hasher) # type: ignore
 
 
 def get_request_password_reset_use_case(
@@ -170,7 +170,7 @@ def get_request_password_reset_use_case(
     email: EmailServiceDep,
 ) -> RequestPasswordResetUseCase:
     return RequestPasswordResetUseCase(
-        uow=uow,
+        uow=uow, # type: ignore
         token_hasher=token_hasher,
         secret_generator=secrets,
         email_service=email,
@@ -182,7 +182,7 @@ def get_reset_password_use_case(
     hasher: PasswordHasherDep,
     token_hasher: TokenHasherDep,
 ) -> ResetPasswordUseCase:
-    return ResetPasswordUseCase(uow=uow, password_hasher=hasher, token_hasher=token_hasher)
+    return ResetPasswordUseCase(uow=uow, password_hasher=hasher, token_hasher=token_hasher) # type: ignore
 
 
 _bearer = HTTPBearer()
