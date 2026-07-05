@@ -1,4 +1,3 @@
-import secrets
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
@@ -18,5 +17,9 @@ class JWTTokenService:
         }
         return jwt.encode(payload, self._secret, algorithm=self._algorithm)
 
-    def generate_refresh_token(self) -> str:
-        return secrets.token_urlsafe(32)
+    def verify_access_token(self, token: str) -> UUID:
+        try:
+            payload = jwt.decode(token, self._secret, algorithms=[self._algorithm])
+            return UUID(payload["sub"])
+        except Exception as exc:
+            raise ValueError("Invalid or expired access token") from exc

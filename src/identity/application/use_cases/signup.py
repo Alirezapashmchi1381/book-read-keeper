@@ -7,6 +7,7 @@ from src.identity.application.use_cases.constants import REFRESH_TOKEN_TTL_DAYS
 from src.identity.domain.entities.refresh_token import RefreshToken
 from src.identity.domain.entities.user import User
 from src.identity.domain.ports.password_hasher import PasswordHasher
+from src.identity.domain.ports.secret_generator import SecretGenerator
 from src.identity.domain.ports.token_hasher import TokenHasher
 from src.identity.domain.ports.token_service import TokenService
 from src.identity.domain.ports.unit_of_work import IdentityUnitOfWork
@@ -19,6 +20,7 @@ class SignupUseCase:
     password_hasher: PasswordHasher
     token_hasher: TokenHasher
     token_service: TokenService
+    secret_generator: SecretGenerator
 
     async def execute(self, dto: SignupInputDto) -> AuthResultDto:
         async with self.uow as uow:
@@ -37,7 +39,7 @@ class SignupUseCase:
             )
             await uow.users.command.save(user)
 
-            raw_refresh_token = self.token_service.generate_refresh_token()
+            raw_refresh_token = self.secret_generator.generate()
             refresh_token = RefreshToken.create(
                 user_id=user.id,
                 token_hash=self.token_hasher.hash(raw_refresh_token),

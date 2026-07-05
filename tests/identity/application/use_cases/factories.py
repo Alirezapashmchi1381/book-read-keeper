@@ -56,12 +56,20 @@ class FakeTokenHasher:
         return hashed == f"token:{token}"
 
 
+class FakeSecretGenerator:
+    def generate(self) -> str:
+        return "fake-refresh-token"
+
+
 class FakeTokenService:
     def generate_access_token(self, user_id) -> str:
         return "fake-access-token"
 
-    def generate_refresh_token(self) -> str:
-        return "fake-refresh-token"
+    def verify_access_token(self, token: str):
+        from uuid import UUID
+        if token == "fake-access-token":
+            return UUID("00000000-0000-0000-0000-000000000001")
+        raise ValueError("Invalid or expired access token")
 
 
 class FakeEmailService:

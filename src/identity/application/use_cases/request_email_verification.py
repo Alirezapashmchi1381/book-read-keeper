@@ -6,8 +6,8 @@ from src.identity.application.dtos.verify_email_dto import RequestEmailVerificat
 from src.identity.application.use_cases.constants import VERIFICATION_TOKEN_TTL_HOURS
 from src.identity.domain.entities.email_verification_token import EmailVerificationToken
 from src.identity.domain.ports.email_service import EmailService
+from src.identity.domain.ports.secret_generator import SecretGenerator
 from src.identity.domain.ports.token_hasher import TokenHasher
-from src.identity.domain.ports.token_service import TokenService
 from src.identity.domain.ports.unit_of_work import IdentityUnitOfWork
 
 
@@ -15,7 +15,7 @@ from src.identity.domain.ports.unit_of_work import IdentityUnitOfWork
 class RequestEmailVerificationUseCase:
     uow: IdentityUnitOfWork
     token_hasher: TokenHasher
-    token_service: TokenService
+    secret_generator: SecretGenerator
     email_service: EmailService
 
     async def execute(self, dto: RequestEmailVerificationInputDto) -> None:
@@ -30,7 +30,7 @@ class RequestEmailVerificationUseCase:
 
             await uow.email_verification_tokens.command.delete_all_for_user(user.id)
 
-            raw_token = self.token_service.generate_refresh_token()
+            raw_token = self.secret_generator.generate()
             verification_token = EmailVerificationToken.create(
                 user_id=user.id,
                 token_hash=self.token_hasher.hash(raw_token),

@@ -6,8 +6,14 @@ from tests.identity.application.use_cases.factories import make_user # type: ign
 
 
 @pytest.fixture
-def use_case(fake_uow, fake_hasher, fake_token_hasher, fake_tokens) -> LoginUseCase:
-    return LoginUseCase(uow=fake_uow, password_hasher=fake_hasher, token_hasher=fake_token_hasher, token_service=fake_tokens)
+def use_case(fake_uow, fake_hasher, fake_token_hasher, fake_tokens, fake_secret_generator) -> LoginUseCase:
+    return LoginUseCase(
+        uow=fake_uow,
+        password_hasher=fake_hasher,
+        token_hasher=fake_token_hasher,
+        token_service=fake_tokens,
+        secret_generator=fake_secret_generator,
+    )
 
 
 @pytest.fixture

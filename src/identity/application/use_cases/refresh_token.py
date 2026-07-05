@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from src.identity.application.dtos.refresh_token_dto import RefreshTokenInputDto, RefreshTokenResultDto
 from src.identity.application.use_cases.constants import REFRESH_TOKEN_TTL_DAYS
 from src.identity.domain.entities.refresh_token import RefreshToken
+from src.identity.domain.ports.secret_generator import SecretGenerator
 from src.identity.domain.ports.token_hasher import TokenHasher
 from src.identity.domain.ports.token_service import TokenService
 from src.identity.domain.ports.unit_of_work import IdentityUnitOfWork
@@ -14,6 +15,7 @@ class RefreshTokenUseCase:
     uow: IdentityUnitOfWork
     token_hasher: TokenHasher
     token_service: TokenService
+    secret_generator: SecretGenerator
 
     async def execute(self, dto: RefreshTokenInputDto) -> RefreshTokenResultDto:
         async with self.uow as uow:
@@ -26,7 +28,7 @@ class RefreshTokenUseCase:
             # Rotate: revoke old token, issue a new one
             await uow.refresh_tokens.command.revoke(token.id)
 
-            raw_new_refresh_token = self.token_service.generate_refresh_token()
+            raw_new_refresh_token = self.secret_generator.generate()
             new_refresh_token = RefreshToken.create(
                 user_id=token.user_id,
                 token_hash=self.token_hasher.hash(raw_new_refresh_token),

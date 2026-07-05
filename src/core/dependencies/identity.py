@@ -19,6 +19,7 @@ from src.identity.application.use_cases.verify_email import VerifyEmailUseCase
 from src.identity.infrastructure.services.bcrypt_password_hasher import BcryptPasswordHasher
 from src.identity.infrastructure.services.hmac_token_hasher import HMACTokenHasher
 from src.identity.infrastructure.services.jwt_token_service import JWTTokenService
+from src.identity.infrastructure.services.secrets_generator import SecretsGenerator
 from src.identity.infrastructure.services.stub_email_service import StubEmailService
 from src.identity.infrastructure.sql.unit_of_work import SQLAlchemyIdentityUnitOfWork
 
@@ -48,6 +49,10 @@ def get_token_service(settings: Settings = Depends(get_settings)) -> JWTTokenSer
     )
 
 
+def get_secret_generator() -> SecretsGenerator:
+    return SecretsGenerator()
+
+
 def get_email_service() -> StubEmailService:
     return StubEmailService()
 
@@ -57,6 +62,7 @@ IdentityUoWDep = Annotated[SQLAlchemyIdentityUnitOfWork, Depends(get_identity_uo
 PasswordHasherDep = Annotated[BcryptPasswordHasher, Depends(get_password_hasher)]
 TokenHasherDep = Annotated[HMACTokenHasher, Depends(get_token_hasher)]
 TokenServiceDep = Annotated[JWTTokenService, Depends(get_token_service)]
+SecretGeneratorDep = Annotated[SecretsGenerator, Depends(get_secret_generator)]
 EmailServiceDep = Annotated[StubEmailService, Depends(get_email_service)]
 
 # ---------------------------------------------------------------------------
@@ -68,8 +74,15 @@ def get_signup_use_case(
     hasher: PasswordHasherDep,
     token_hasher: TokenHasherDep,
     tokens: TokenServiceDep,
+    secrets: SecretGeneratorDep,
 ) -> SignupUseCase:
-    return SignupUseCase(uow=uow, password_hasher=hasher, token_hasher=token_hasher, token_service=tokens)
+    return SignupUseCase(
+        uow=uow,
+        password_hasher=hasher,
+        token_hasher=token_hasher,
+        token_service=tokens,
+        secret_generator=secrets,
+    )
 
 
 def get_login_use_case(
@@ -77,8 +90,15 @@ def get_login_use_case(
     hasher: PasswordHasherDep,
     token_hasher: TokenHasherDep,
     tokens: TokenServiceDep,
+    secrets: SecretGeneratorDep,
 ) -> LoginUseCase:
-    return LoginUseCase(uow=uow, password_hasher=hasher, token_hasher=token_hasher, token_service=tokens)
+    return LoginUseCase(
+        uow=uow,
+        password_hasher=hasher,
+        token_hasher=token_hasher,
+        token_service=tokens,
+        secret_generator=secrets,
+    )
 
 
 def get_logout_use_case(
@@ -96,8 +116,14 @@ def get_refresh_token_use_case(
     uow: IdentityUoWDep,
     token_hasher: TokenHasherDep,
     tokens: TokenServiceDep,
+    secrets: SecretGeneratorDep,
 ) -> RefreshTokenUseCase:
-    return RefreshTokenUseCase(uow=uow, token_hasher=token_hasher, token_service=tokens)
+    return RefreshTokenUseCase(
+        uow=uow,
+        token_hasher=token_hasher,
+        token_service=tokens,
+        secret_generator=secrets,
+    )
 
 
 def get_change_password_use_case(
@@ -114,11 +140,14 @@ def get_deactivate_account_use_case(uow: IdentityUoWDep) -> DeactivateAccountUse
 def get_request_email_verification_use_case(
     uow: IdentityUoWDep,
     token_hasher: TokenHasherDep,
-    tokens: TokenServiceDep,
+    secrets: SecretGeneratorDep,
     email: EmailServiceDep,
 ) -> RequestEmailVerificationUseCase:
     return RequestEmailVerificationUseCase(
-        uow=uow, token_hasher=token_hasher, token_service=tokens, email_service=email
+        uow=uow,
+        token_hasher=token_hasher,
+        secret_generator=secrets,
+        email_service=email,
     )
 
 
@@ -132,11 +161,14 @@ def get_verify_email_use_case(
 def get_request_password_reset_use_case(
     uow: IdentityUoWDep,
     token_hasher: TokenHasherDep,
-    tokens: TokenServiceDep,
+    secrets: SecretGeneratorDep,
     email: EmailServiceDep,
 ) -> RequestPasswordResetUseCase:
     return RequestPasswordResetUseCase(
-        uow=uow, token_hasher=token_hasher, token_service=tokens, email_service=email
+        uow=uow,
+        token_hasher=token_hasher,
+        secret_generator=secrets,
+        email_service=email,
     )
 
 

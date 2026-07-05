@@ -6,11 +6,11 @@ from tests.identity.application.use_cases.factories import make_user
 
 
 @pytest.fixture
-def use_case(fake_uow, fake_token_hasher, fake_tokens, fake_email_service) -> RequestEmailVerificationUseCase:
+def use_case(fake_uow, fake_token_hasher, fake_secret_generator, fake_email_service) -> RequestEmailVerificationUseCase:
     return RequestEmailVerificationUseCase(
         uow=fake_uow,
         token_hasher=fake_token_hasher,
-        token_service=fake_tokens,
+        secret_generator=fake_secret_generator,
         email_service=fake_email_service,
     )
 
