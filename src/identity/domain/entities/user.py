@@ -1,14 +1,14 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from uuid import uuid4
+from uuid import UUID
 
 from src.identity.domain.value_objects.email import Email
-from src.identity.domain.value_objects.user_id import UserId
 from src.identity.domain.ports.password_hasher import PasswordHasher
 
 @dataclass
 class User():
-    id: UserId
+    id: UUID
     email: Email
     username: str
     password_hash: str
@@ -36,7 +36,7 @@ class User():
     @classmethod
     def create(cls, email: Email, username: str, password_hash: str) -> "User":
         return cls(
-            id=UserId(uuid4()),
+            id=uuid4(),
             email=email,
             username=username,
             password_hash=password_hash,

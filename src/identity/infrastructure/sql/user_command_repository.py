@@ -1,8 +1,7 @@
 from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from uuid import UUID
 from src.identity.domain.entities.user import User
-from src.identity.domain.value_objects.user_id import UserId
 from src.identity.infrastructure.sql.models.user_model import UserModel
 from src.identity.infrastructure.sql.transformers.user_transformer import UserTransformer
 
@@ -15,7 +14,7 @@ class SQLAlchemyUserCommandRepository:
         model = UserTransformer.to_model(user)
         await self._session.merge(model)
 
-    async def delete(self, user_id: UserId) -> None:
+    async def delete(self, user_id: UUID) -> None:
         await self._session.execute(
-            delete(UserModel).where(UserModel.id == user_id.value)
+            delete(UserModel).where(UserModel.id == user_id)
         )

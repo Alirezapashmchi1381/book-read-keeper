@@ -1,6 +1,5 @@
 from src.identity.domain.entities.user import User
 from src.identity.domain.value_objects.email import Email
-from src.identity.domain.value_objects.user_id import UserId
 from src.identity.infrastructure.sql.models.user_model import UserModel
 
 
@@ -8,7 +7,7 @@ class UserTransformer:
     @staticmethod
     def to_domain(model: UserModel) -> User:
         return User(
-            id=UserId(model.id),
+            id=model.id,
             email=Email(model.email),
             username=model.username,
             password_hash=model.password_hash,
@@ -21,7 +20,7 @@ class UserTransformer:
     @staticmethod
     def to_model(entity: User) -> UserModel:
         return UserModel(
-            id=entity.id.value,
+            id=entity.id,
             email=entity.email.address,
             username=entity.username,
             password_hash=entity.password_hash,

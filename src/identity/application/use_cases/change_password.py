@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from src.identity.application.dtos.change_password_dto import ChangePasswordInputDto
 from src.identity.domain.ports.password_hasher import PasswordHasher
 from src.identity.domain.ports.unit_of_work import IdentityUnitOfWork
-from src.identity.domain.value_objects.user_id import UserId
 
 
 @dataclass
@@ -13,7 +12,7 @@ class ChangePasswordUseCase:
 
     async def execute(self, dto: ChangePasswordInputDto) -> None:
         async with self.uow as uow:
-            user = await uow.users.query.find_by_id(UserId(dto.user_id))
+            user = await uow.users.query.find_by_id(dto.user_id)
 
             if user is None:
                 raise ValueError("User not found")

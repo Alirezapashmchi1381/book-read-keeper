@@ -28,11 +28,11 @@ class RequestPasswordResetUseCase:
                 return
 
             # Invalidate any existing reset tokens before issuing a new one
-            await uow.password_reset_tokens.command.delete_all_for_user(user.id.value)
+            await uow.password_reset_tokens.command.delete_all_for_user(user.id)
 
             raw_token = self.token_service.generate_refresh_token()
             reset_token = PasswordResetToken.create(
-                user_id=user.id.value,
+                user_id=user.id,
                 token_hash=self.password_hasher.hash(raw_token),
                 expires_at=datetime.now() + timedelta(hours=RESET_TOKEN_TTL_HOURS),
             )

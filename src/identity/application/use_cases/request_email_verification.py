@@ -9,7 +9,6 @@ from src.identity.domain.ports.email_service import EmailService
 from src.identity.domain.ports.password_hasher import PasswordHasher
 from src.identity.domain.ports.token_service import TokenService
 from src.identity.domain.ports.unit_of_work import IdentityUnitOfWork
-from src.identity.domain.value_objects.user_id import UserId
 
 
 @dataclass
@@ -21,7 +20,7 @@ class RequestEmailVerificationUseCase:
 
     async def execute(self, dto: RequestEmailVerificationInputDto) -> None:
         async with self.uow as uow:
-            user = await uow.users.query.find_by_id(UserId(UUID(dto.user_id)))
+            user = await uow.users.query.find_by_id(UUID(dto.user_id))
 
             if user is None:
                 raise ValueError("User not found")
@@ -29,11 +28,11 @@ class RequestEmailVerificationUseCase:
             if user.is_verified:
                 return
 
-            await uow.email_verification_tokens.command.delete_all_for_user(user.id.value)
+            await uow.email_verification_tokens.command.delete_all_for_user(user.id)
 
             raw_token = self.token_service.generate_refresh_token()
             verification_token = EmailVerificationToken.create(
-                user_id=user.id.value,
+                user_id=user.id,
                 token_hash=self.password_hasher.hash(raw_token),
                 expires_at=datetime.now() + timedelta(hours=VERIFICATION_TOKEN_TTL_HOURS),
             )

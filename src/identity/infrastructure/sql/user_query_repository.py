@@ -1,11 +1,11 @@
 from typing import Optional
+from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.identity.domain.entities.user import User
 from src.identity.domain.value_objects.email import Email
-from src.identity.domain.value_objects.user_id import UserId
 from src.identity.infrastructure.sql.models.user_model import UserModel
 from src.identity.infrastructure.sql.transformers.user_transformer import UserTransformer
 
@@ -14,9 +14,9 @@ class SQLAlchemyUserQueryRepository:
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
-    async def find_by_id(self, user_id: UserId) -> Optional[User]:
+    async def find_by_id(self, user_id: UUID) -> Optional[User]:
         result = await self._session.execute(
-            select(UserModel).where(UserModel.id == user_id.value)
+            select(UserModel).where(UserModel.id == user_id)
         )
         model = result.scalar_one_or_none()
         return UserTransformer.to_domain(model) if model else None

@@ -37,18 +37,18 @@ class SignupUseCase:
 
             raw_refresh_token = self.token_service.generate_refresh_token()
             refresh_token = RefreshToken.create(
-                user_id=user.id.value,
+                user_id=user.id,
                 token_hash=self.password_hasher.hash(raw_refresh_token),
                 expires_at=datetime.now() + timedelta(days=REFRESH_TOKEN_TTL_DAYS),
             )
             await uow.refresh_tokens.command.save(refresh_token)
 
-            access_token = self.token_service.generate_access_token(user.id.value)
+            access_token = self.token_service.generate_access_token(user.id)
 
             return AuthResultDto(
                 access_token=access_token,
                 refresh_token=raw_refresh_token,
-                user_id=user.id.value,
+                user_id=user.id,
                 username=user.username,
                 email=user.email.address,
             )
