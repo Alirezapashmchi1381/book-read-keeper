@@ -1,5 +1,6 @@
 import pytest
 
+from src.identity.domain.exceptions import NotFoundError
 from src.identity.application.dtos.verify_email_dto import RequestEmailVerificationInputDto
 from src.identity.application.use_cases.request_email_verification import RequestEmailVerificationUseCase
 from tests.identity.application.use_cases.factories import make_user
@@ -58,5 +59,5 @@ async def test_is_silent_if_user_already_verified(use_case, fake_uow, fake_email
 async def test_raises_if_user_not_found(use_case, fake_uow, dto):
     fake_uow.users.query.find_by_id.return_value = None
 
-    with pytest.raises(ValueError, match="User not found"):
+    with pytest.raises(NotFoundError, match="User not found"):
         await use_case.execute(dto)

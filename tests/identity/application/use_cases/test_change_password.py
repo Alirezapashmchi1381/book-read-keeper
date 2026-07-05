@@ -1,7 +1,9 @@
 import pytest
 
+from src.identity.domain.exceptions import AuthenticationError
 from src.identity.application.dtos.change_password_dto import ChangePasswordInputDto
 from src.identity.application.use_cases.change_password import ChangePasswordUseCase
+from src.identity.domain.exceptions import NotFoundError,AuthenticationError
 from tests.identity.application.use_cases.factories import FakePasswordHasher, make_user
 
 
@@ -44,7 +46,7 @@ async def test_change_password_revokes_all_sessions(use_case, fake_uow, user, dt
 async def test_change_password_raises_if_user_not_found(use_case, fake_uow, dto):
     fake_uow.users.query.find_by_id.return_value = None
 
-    with pytest.raises(ValueError, match="User not found"):
+    with pytest.raises(NotFoundError, match="User not found"):
         await use_case.execute(dto)
 
 
@@ -56,7 +58,7 @@ async def test_change_password_raises_if_current_password_wrong(use_case, fake_u
         new_password="new-password",
     )
 
-    with pytest.raises(ValueError, match="Current password is incorrect"):
+    with pytest.raises(AuthenticationError, match="Current password is incorrect"):
         await use_case.execute(wrong_dto)
 
 
@@ -68,7 +70,7 @@ async def test_change_password_does_not_save_on_wrong_password(use_case, fake_uo
         new_password="new-password",
     )
 
-    with pytest.raises(ValueError):
+    with pytest.raises(AuthenticationError, match= "Current password is incorrect" ):
         await use_case.execute(wrong_dto)
 
     fake_uow.users.command.save.assert_not_called()

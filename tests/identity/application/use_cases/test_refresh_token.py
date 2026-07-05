@@ -1,5 +1,6 @@
 import pytest
 
+from src.identity.domain.exceptions import InvalidTokenError
 from src.identity.application.dtos.refresh_token_dto import RefreshTokenInputDto
 from src.identity.application.use_cases.refresh_token import RefreshTokenUseCase
 from tests.identity.application.use_cases.factories import make_refresh_token
@@ -46,7 +47,7 @@ async def test_refresh_token_revokes_old_and_saves_new(use_case, fake_uow, dto, 
 async def test_refresh_token_raises_if_token_not_found(use_case, fake_uow, dto):
     fake_uow.refresh_tokens.query.find_by_token_hash.return_value = None
 
-    with pytest.raises(ValueError, match="Invalid or expired refresh token"):
+    with pytest.raises(InvalidTokenError, match="Invalid or expired refresh token"):
         await use_case.execute(dto)
 
 
@@ -54,7 +55,7 @@ async def test_refresh_token_raises_if_token_expired(use_case, fake_uow, dto):
     expired = make_refresh_token(raw_token=dto.refresh_token, expired=True)
     fake_uow.refresh_tokens.query.find_by_token_hash.return_value = expired
 
-    with pytest.raises(ValueError, match="Invalid or expired refresh token"):
+    with pytest.raises(InvalidTokenError, match="Invalid or expired refresh token"):
         await use_case.execute(dto)
 
 
@@ -62,5 +63,5 @@ async def test_refresh_token_raises_if_token_revoked(use_case, fake_uow, dto):
     revoked = make_refresh_token(raw_token=dto.refresh_token, revoked=True)
     fake_uow.refresh_tokens.query.find_by_token_hash.return_value = revoked
 
-    with pytest.raises(ValueError, match="Invalid or expired refresh token"):
+    with pytest.raises(InvalidTokenError, match="Invalid or expired refresh token"):
         await use_case.execute(dto)

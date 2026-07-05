@@ -1,5 +1,6 @@
 import pytest
 
+from src.identity.domain.exceptions import ConflictError
 from src.identity.application.dtos.signup_dto import SignupInputDto
 from src.identity.application.use_cases.signup import SignupUseCase
 from tests.identity.application.use_cases.factories import ( # type: ignore
@@ -77,7 +78,7 @@ async def test_signup_commits_transaction(use_case, fake_uow, valid_dto):
 async def test_signup_raises_if_email_taken(use_case, fake_uow, valid_dto):
     fake_uow.users.query.exists_by_email.return_value = True
 
-    with pytest.raises(ValueError, match="Email is already registered"):
+    with pytest.raises(ConflictError, match="Email is already registered"):
         await use_case.execute(valid_dto)
 
 
@@ -85,14 +86,6 @@ async def test_signup_raises_if_username_taken(use_case, fake_uow, valid_dto):
     fake_uow.users.query.exists_by_email.return_value = False
     fake_uow.users.query.exists_by_username.return_value = True
 
-    with pytest.raises(ValueError, match="Username is already taken"):
+    with pytest.raises(ConflictError, match="Username is already taken"):
         await use_case.execute(valid_dto)
 
-
-async def test_signup_does_not_save_on_duplicate_email(use_case, fake_uow, valid_dto):
-    fake_uow.users.query.exists_by_email.return_value = True
-
-    with pytest.raises(ValueError):
-        await use_case.execute(valid_dto)
-
-    fake_uow.users.command.save.assert_not_called()

@@ -1,5 +1,6 @@
 import pytest
 
+from src.identity.domain.exceptions import AuthenticationError
 from src.identity.application.dtos.login_dto import LoginInputDto
 from src.identity.application.use_cases.login import LoginUseCase
 from tests.identity.application.use_cases.factories import make_user # type: ignore
@@ -64,7 +65,7 @@ async def test_login_commits_transaction(use_case, fake_uow, dto, active_user):
 async def test_login_raises_if_user_not_found(use_case, fake_uow, dto):
     fake_uow.users.query.find_by_email.return_value = None
 
-    with pytest.raises(ValueError, match="Invalid credentials"):
+    with pytest.raises(AuthenticationError, match="Invalid credentials"):
         await use_case.execute(dto)
 
 
@@ -72,7 +73,7 @@ async def test_login_raises_if_wrong_password(use_case, fake_uow, dto, active_us
     fake_uow.users.query.find_by_email.return_value = active_user
     wrong_dto = LoginInputDto(email=dto.email, password="wrong-password")
 
-    with pytest.raises(ValueError, match="Invalid credentials"):
+    with pytest.raises(AuthenticationError, match="Invalid credentials"):
         await use_case.execute(wrong_dto)
 
 
@@ -81,5 +82,5 @@ async def test_login_raises_if_account_deactivated(use_case, fake_uow, dto):
     inactive_user.deactivate()
     fake_uow.users.query.find_by_email.return_value = inactive_user
 
-    with pytest.raises(ValueError, match="Account is deactivated"):
+    with pytest.raises(AuthenticationError, match="Account is deactivated"):
         await use_case.execute(dto)

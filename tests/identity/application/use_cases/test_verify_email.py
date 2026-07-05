@@ -1,5 +1,6 @@
 import pytest
 
+from src.identity.domain.exceptions import InvalidTokenError, NotFoundError
 from src.identity.application.dtos.verify_email_dto import VerifyEmailInputDto
 from src.identity.application.use_cases.verify_email import VerifyEmailUseCase
 from tests.identity.application.use_cases.factories import make_email_verification_token, make_user
@@ -47,7 +48,7 @@ async def test_verify_email_deletes_token_after_use(use_case, fake_uow, user, ve
 async def test_verify_email_raises_if_token_not_found(use_case, fake_uow, dto):
     fake_uow.email_verification_tokens.query.find_by_token_hash.return_value = None
 
-    with pytest.raises(ValueError, match="Invalid or expired verification token"):
+    with pytest.raises(InvalidTokenError, match="Invalid or expired verification token"):
         await use_case.execute(dto)
 
 
@@ -55,7 +56,7 @@ async def test_verify_email_raises_if_token_expired(use_case, fake_uow, dto):
     expired = make_email_verification_token(raw_token=dto.verification_token, expired=True)
     fake_uow.email_verification_tokens.query.find_by_token_hash.return_value = expired
 
-    with pytest.raises(ValueError, match="Invalid or expired verification token"):
+    with pytest.raises(InvalidTokenError, match="Invalid or expired verification token"):
         await use_case.execute(dto)
 
 
@@ -63,5 +64,5 @@ async def test_verify_email_raises_if_user_not_found(use_case, fake_uow, verific
     fake_uow.email_verification_tokens.query.find_by_token_hash.return_value = verification_token
     fake_uow.users.query.find_by_id.return_value = None
 
-    with pytest.raises(ValueError, match="User not found"):
+    with pytest.raises(NotFoundError, match="User not found"):
         await use_case.execute(dto)

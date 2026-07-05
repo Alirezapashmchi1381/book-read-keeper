@@ -1,5 +1,6 @@
 import pytest
 
+from src.identity.domain.exceptions import NotFoundError
 from src.identity.application.dtos.deactivate_account_dto import DeactivateAccountInputDto
 from src.identity.application.use_cases.deactivate_account import DeactivateAccountUseCase
 from tests.identity.application.use_cases.factories import make_user
@@ -40,5 +41,5 @@ async def test_deactivate_account_revokes_all_sessions(use_case, fake_uow, user,
 async def test_deactivate_account_raises_if_user_not_found(use_case, fake_uow, dto):
     fake_uow.users.query.find_by_id.return_value = None
 
-    with pytest.raises(ValueError, match="User not found"):
+    with pytest.raises(NotFoundError, match="User not found"):
         await use_case.execute(dto)
