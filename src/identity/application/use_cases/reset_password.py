@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from src.identity.application.dtos.reset_password_dto import ResetPasswordInputDto
+from src.identity.domain.exceptions import InvalidTokenError, NotFoundError
 from src.identity.domain.ports.password_hasher import PasswordHasher
 from src.identity.domain.ports.token_hasher import TokenHasher
 from src.identity.domain.ports.unit_of_work import IdentityUnitOfWork
@@ -19,11 +20,11 @@ class ResetPasswordUseCase:
             reset_token = await uow.password_reset_tokens.query.find_by_token_hash(token_hash)
 
             if reset_token is None or reset_token.is_expired(datetime.now()):
-                raise ValueError("Invalid or expired reset token")
+                raise InvalidTokenError("Invalid or expired reset token")
 
             user = await uow.users.query.find_by_id(reset_token.user_id)
             if user is None:
-                raise ValueError("User not found")
+                raise NotFoundError("User not found")
 
             user.password_hash = self.password_hasher.hash(dto.new_password)
             await uow.users.command.save(user)

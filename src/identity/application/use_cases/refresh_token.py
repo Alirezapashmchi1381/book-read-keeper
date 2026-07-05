@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from src.identity.application.dtos.refresh_token_dto import RefreshTokenInputDto, RefreshTokenResultDto
 from src.identity.application.use_cases.constants import REFRESH_TOKEN_TTL_DAYS
 from src.identity.domain.entities.refresh_token import RefreshToken
+from src.identity.domain.exceptions import InvalidTokenError
 from src.identity.domain.ports.secret_generator import SecretGenerator
 from src.identity.domain.ports.token_hasher import TokenHasher
 from src.identity.domain.ports.token_service import TokenService
@@ -23,7 +24,7 @@ class RefreshTokenUseCase:
             token = await uow.refresh_tokens.query.find_by_token_hash(token_hash)
 
             if token is None or not token.is_valid(datetime.now()):
-                raise ValueError("Invalid or expired refresh token")
+                raise InvalidTokenError("Invalid or expired refresh token")
 
             # Rotate: revoke old token, issue a new one
             await uow.refresh_tokens.command.revoke(token.id)

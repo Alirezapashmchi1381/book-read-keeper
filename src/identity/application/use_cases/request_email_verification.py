@@ -5,6 +5,7 @@ from uuid import UUID
 from src.identity.application.dtos.verify_email_dto import RequestEmailVerificationInputDto
 from src.identity.application.use_cases.constants import VERIFICATION_TOKEN_TTL_HOURS
 from src.identity.domain.entities.email_verification_token import EmailVerificationToken
+from src.identity.domain.exceptions import NotFoundError
 from src.identity.domain.ports.email_service import EmailService
 from src.identity.domain.ports.secret_generator import SecretGenerator
 from src.identity.domain.ports.token_hasher import TokenHasher
@@ -23,7 +24,7 @@ class RequestEmailVerificationUseCase:
             user = await uow.users.query.find_by_id(UUID(dto.user_id))
 
             if user is None:
-                raise ValueError("User not found")
+                raise NotFoundError("User not found")
 
             if user.is_verified:
                 return

@@ -6,6 +6,7 @@ from src.identity.application.dtos.signup_dto import SignupInputDto
 from src.identity.application.use_cases.constants import REFRESH_TOKEN_TTL_DAYS
 from src.identity.domain.entities.refresh_token import RefreshToken
 from src.identity.domain.entities.user import User
+from src.identity.domain.exceptions import ConflictError
 from src.identity.domain.ports.password_hasher import PasswordHasher
 from src.identity.domain.ports.secret_generator import SecretGenerator
 from src.identity.domain.ports.token_hasher import TokenHasher
@@ -27,10 +28,10 @@ class SignupUseCase:
             email = Email(dto.email)
 
             if await uow.users.query.exists_by_email(email):
-                raise ValueError("Email is already registered")
+                raise ConflictError("Email is already registered")
 
             if await uow.users.query.exists_by_username(dto.username):
-                raise ValueError("Username is already taken")
+                raise ConflictError("Username is already taken")
 
             user = User.create(
                 email=email,

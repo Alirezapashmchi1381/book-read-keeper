@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from src.identity.application.dtos.deactivate_account_dto import DeactivateAccountInputDto
+from src.identity.domain.exceptions import NotFoundError
 from src.identity.domain.ports.unit_of_work import IdentityUnitOfWork
 
 
@@ -13,7 +14,7 @@ class DeactivateAccountUseCase:
             user = await uow.users.query.find_by_id(dto.user_id)
 
             if user is None:
-                raise ValueError("User not found")
+                raise NotFoundError("User not found")
 
             user.deactivate()
             await uow.users.command.save(user)

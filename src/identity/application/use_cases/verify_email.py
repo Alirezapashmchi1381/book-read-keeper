@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from src.identity.application.dtos.verify_email_dto import VerifyEmailInputDto
+from src.identity.domain.exceptions import InvalidTokenError, NotFoundError
 from src.identity.domain.ports.token_hasher import TokenHasher
 from src.identity.domain.ports.unit_of_work import IdentityUnitOfWork
 
@@ -17,11 +18,11 @@ class VerifyEmailUseCase:
             verification_token = await uow.email_verification_tokens.query.find_by_token_hash(token_hash)
 
             if verification_token is None or verification_token.is_expired(datetime.now()):
-                raise ValueError("Invalid or expired verification token")
+                raise InvalidTokenError("Invalid or expired verification token")
 
             user = await uow.users.query.find_by_id(verification_token.user_id)
             if user is None:
-                raise ValueError("User not found")
+                raise NotFoundError("User not found")
 
             user.verify()
             await uow.users.command.save(user)
