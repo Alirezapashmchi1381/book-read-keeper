@@ -17,7 +17,7 @@ class ChangePasswordUseCase:
             if user is None:
                 raise ValueError("User not found")
 
-            if not self.password_hasher.verify(dto.current_password, user.password_hash):
+            if not user.verify_password(dto.current_password, self.password_hasher):
                 raise ValueError("Current password is incorrect")
 
             user.password_hash = self.password_hasher.hash(dto.new_password)

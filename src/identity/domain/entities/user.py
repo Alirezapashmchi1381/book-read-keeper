@@ -33,6 +33,9 @@ class User():
         self.is_verified = True
         self.updated_at = datetime.now()
 
+    def verify_password(self, plain_password: str, password_hasher: PasswordHasher) -> bool:
+        return password_hasher.verify(plain_password, self.password_hash)
+
     @classmethod
     def create(cls, email: Email, username: str, password_hash: str) -> "User":
         return cls(

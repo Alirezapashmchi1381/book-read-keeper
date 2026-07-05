@@ -27,7 +27,7 @@ class LoginUseCase:
             user = await uow.users.query.find_by_email(email)
 
             # Single generic message to avoid leaking whether the email exists.
-            if user is None or not self.password_hasher.verify(dto.password, user.password_hash):
+            if user is None or not user.verify_password(dto.password, self.password_hasher):
                 raise ValueError("Invalid credentials")
 
             if not user.is_active:
