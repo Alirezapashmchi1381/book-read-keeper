@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from datetime import datetime
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import BigInteger, Boolean, DateTime, Integer, String, Text
@@ -6,7 +9,10 @@ from sqlalchemy.dialects.postgresql import UUID as PgUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.library.infrastructure.sql.models.base import Base
-from src.library.infrastructure.sql.models.shelf_book_association import ShelfBookAssociation
+
+if TYPE_CHECKING:
+    from src.library.infrastructure.sql.models.shelf_book_association import ShelfBookAssociation
+
 
 class BookModel(Base):
     __tablename__ = "books"
@@ -35,7 +41,7 @@ class BookModel(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.now)
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)
 
-    shelf_associations: Mapped[list["ShelfBookAssociation"]] = relationship(
+    shelf_associations: Mapped[list[ShelfBookAssociation]] = relationship(
         "ShelfBookAssociation",
         back_populates="book",
         cascade="all, delete-orphan",
