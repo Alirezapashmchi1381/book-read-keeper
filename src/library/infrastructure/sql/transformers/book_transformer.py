@@ -1,11 +1,9 @@
 from typing import cast
-from uuid import UUID
 
 from src.library.domain.entities.book import Book
 from src.library.domain.value_objects.author import Author
 from src.library.domain.value_objects.isbn import ISBN
 from src.library.domain.value_objects.language import Language
-from src.library.domain.value_objects.shelf_name import ShelfName
 from src.library.domain.value_objects.color import Color
 from src.library.domain.value_objects.book_metadata import BookMetadata
 from src.library.domain.value_objects.book_file import BookFile
@@ -20,7 +18,7 @@ from src.library.infrastructure.sql.models.book_model import BookModel
 
 class BookTransformer:
     @staticmethod
-    def to_domain(model: BookModel, shelf_name: str = "Unknown") -> Book:
+    def to_domain(model: BookModel) -> Book:
         metadata = BookMetadata(
             author=Author(
                 first_name=model.author_first_name,
@@ -29,7 +27,6 @@ class BookTransformer:
             isbn=ISBN(model.isbn),
             title=model.title,
             language=Language(model.language),
-            shelf_name=ShelfName(shelf_name),
             color=Color(model.color),
             description=model.description,
         )
@@ -43,7 +40,6 @@ class BookTransformer:
                 raise ValueError(
                     f"Book {model.id} has storage_key but incomplete file metadata"
                 )
-            # All fields are guaranteed non-None after the validation check above
             book_file = BookFile(
                 storage_key=StorageKey(model.storage_key),
                 format=FileFormat(cast(str, model.file_format)),
@@ -82,10 +78,9 @@ class BookTransformer:
         )
 
     @staticmethod
-    def to_model(entity: Book, shelf_id: UUID) -> BookModel:
+    def to_model(entity: Book) -> BookModel:
         return BookModel(
             id=entity.id,
-            shelf_id=shelf_id,
             title=entity.metadata.title,
             author_first_name=entity.metadata.author.first_name,
             author_last_name=entity.metadata.author.last_name,

@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 from uuid import UUID, uuid4
 from datetime import datetime
-from typing import Optional
 
 from src.library.domain.value_objects.book_metadata import BookMetadata
 from src.library.domain.value_objects.book_file import BookFile
@@ -49,7 +48,6 @@ class Book:
             isbn=self.metadata.isbn,
             title=title,
             language=self.metadata.language,
-            shelf_name=self.metadata.shelf_name,
             color=self.metadata.color,
             description=self.metadata.description,
         )

@@ -1,18 +1,17 @@
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import BigInteger, Boolean, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import BigInteger, Boolean, DateTime, Integer, String, Text
 from sqlalchemy.dialects.postgresql import UUID as PgUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.library.infrastructure.sql.models.base import Base
-from src.library.infrastructure.sql.models.shelf_model import ShelfModel
+from src.library.infrastructure.sql.models.shelf_book_association import ShelfBookAssociation
 
 class BookModel(Base):
     __tablename__ = "books"
 
     id: Mapped[UUID] = mapped_column(PgUUID(as_uuid=True), primary_key=True)
-    shelf_id: Mapped[UUID] = mapped_column(PgUUID(as_uuid=True), ForeignKey("shelves.id"), nullable=False)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     author_first_name: Mapped[str] = mapped_column(String(100), nullable=False)
     author_last_name: Mapped[str] = mapped_column(String(100), nullable=False)
@@ -36,4 +35,8 @@ class BookModel(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.now)
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)
 
-    shelf: Mapped["ShelfModel"] = relationship("ShelfModel", back_populates="books")
+    shelf_associations: Mapped[list["ShelfBookAssociation"]] = relationship(
+        "ShelfBookAssociation",
+        back_populates="book",
+        cascade="all, delete-orphan",
+    )
