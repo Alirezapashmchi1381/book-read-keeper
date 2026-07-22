@@ -26,7 +26,7 @@ class ResetPasswordUseCase:
             if user is None:
                 raise NotFoundError("User not found")
 
-            user.password_hash = self.password_hasher.hash(dto.new_password)
+            user.reset_password(self.password_hasher, dto.new_password)
             await uow.users.command.save(user)
 
             # Consume the token and force re-login everywhere
