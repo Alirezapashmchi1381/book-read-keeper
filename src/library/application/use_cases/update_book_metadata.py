@@ -21,6 +21,7 @@ class UpdateBookMetadataUseCase:
             if book is None:
                 raise BookNotFoundError(f"Book {dto.book_id} not found")
 
+            # Update metadata fields
             metadata = book.metadata
             new_metadata = BookMetadata(
                 author=Author(
@@ -34,6 +35,13 @@ class UpdateBookMetadataUseCase:
                 description=dto.description if dto.description is not None else metadata.description,
             )
             book.update_metadata(new_metadata)
+
+            # Handle star/unstar
+            if dto.is_starred is True:
+                book.mark_as_starred()
+            elif dto.is_starred is False:
+                book.unstar()
+
             await uow.books.command.save(book)
             await uow.commit()
             return book

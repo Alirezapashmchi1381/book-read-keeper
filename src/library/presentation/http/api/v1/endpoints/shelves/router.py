@@ -37,6 +37,7 @@ from src.library.core.dependencies import (
     get_remove_book_from_shelf_use_case,
     get_reorder_shelf_use_case,
     get_get_shelf_books_use_case,
+    get_current_user_id,
 )
 
 router = APIRouter(prefix="/shelves", tags=["shelves"])
@@ -45,6 +46,7 @@ router = APIRouter(prefix="/shelves", tags=["shelves"])
 @router.post("")
 async def create_shelf(
     body: CreateShelfRequest,
+    user_id: UUID = Depends(get_current_user_id),
     use_case: CreateShelfUseCase = Depends(get_create_shelf_use_case),
 ):
     shelf = await use_case.execute(
@@ -66,6 +68,7 @@ async def create_shelf(
 
 @router.get("")
 async def list_shelves(
+    user_id: UUID = Depends(get_current_user_id),
     use_case: ListShelvesUseCase = Depends(get_list_shelves_use_case),
 ):
     shelves = await use_case.execute()
@@ -89,6 +92,7 @@ async def list_shelves(
 async def update_shelf(
     shelf_id: UUID,
     body: UpdateShelfRequest,
+    user_id: UUID = Depends(get_current_user_id),
     use_case: UpdateShelfUseCase = Depends(get_update_shelf_use_case),
 ):
     shelf = await use_case.execute(
@@ -115,6 +119,7 @@ async def update_shelf(
 @router.post("/{shelf_id}/star")
 async def star_shelf(
     shelf_id: UUID,
+    user_id: UUID = Depends(get_current_user_id),
     use_case: StarShelfUseCase = Depends(get_star_shelf_use_case),
 ):
     await use_case.execute(shelf_id)
@@ -124,6 +129,7 @@ async def star_shelf(
 @router.delete("/{shelf_id}")
 async def delete_shelf(
     shelf_id: UUID,
+    user_id: UUID = Depends(get_current_user_id),
     use_case: DeleteShelfUseCase = Depends(get_delete_shelf_use_case),
 ):
     await use_case.execute(shelf_id)
@@ -133,6 +139,7 @@ async def delete_shelf(
 @router.post("/{shelf_id}/restore")
 async def restore_shelf(
     shelf_id: UUID,
+    user_id: UUID = Depends(get_current_user_id),
     use_case: RestoreShelfUseCase = Depends(get_restore_shelf_use_case),
 ):
     await use_case.execute(shelf_id)
@@ -143,6 +150,7 @@ async def restore_shelf(
 async def add_book_to_shelf(
     shelf_id: UUID,
     body: AddBookToShelfRequest,
+    user_id: UUID = Depends(get_current_user_id),
     use_case: AddBookToShelfUseCase = Depends(get_add_book_to_shelf_use_case),
 ):
     await use_case.execute(
@@ -155,6 +163,7 @@ async def add_book_to_shelf(
 async def remove_book_from_shelf(
     shelf_id: UUID,
     book_id: UUID,
+    user_id: UUID = Depends(get_current_user_id),
     use_case: RemoveBookFromShelfUseCase = Depends(get_remove_book_from_shelf_use_case),
 ):
     await use_case.execute(
@@ -167,6 +176,7 @@ async def remove_book_from_shelf(
 async def reorder_shelf(
     shelf_id: UUID,
     body: ReorderShelfRequest,
+    user_id: UUID = Depends(get_current_user_id),
     use_case: ReorderShelfUseCase = Depends(get_reorder_shelf_use_case),
 ):
     await use_case.execute(
@@ -178,6 +188,7 @@ async def reorder_shelf(
 @router.get("/{shelf_id}/books")
 async def get_shelf_books(
     shelf_id: UUID,
+    user_id: UUID = Depends(get_current_user_id),
     use_case: GetShelfBooksUseCase = Depends(get_get_shelf_books_use_case),
 ):
     books = await use_case.execute(shelf_id)

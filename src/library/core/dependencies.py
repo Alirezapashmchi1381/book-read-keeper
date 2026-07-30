@@ -1,8 +1,11 @@
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import Depends
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+
+from src.shared.auth.dependencies import get_current_user_id  # noqa: F401 – re-exported for convenience
 
 from src.core.dependencies.database import get_session_factory
 from src.library.application.use_cases.create_book import CreateBookUseCase
@@ -23,6 +26,7 @@ from src.library.application.use_cases.add_book_to_shelf import AddBookToShelfUs
 from src.library.application.use_cases.remove_book_from_shelf import RemoveBookFromShelfUseCase
 from src.library.application.use_cases.reorder_shelf import ReorderShelfUseCase
 from src.library.application.use_cases.get_shelf_books import GetShelfBooksUseCase
+from src.library.application.use_cases.get_book import GetBookUseCase
 from src.library.infrastructure.services.stub_file_storage import StubFileStorageService
 from src.library.infrastructure.sql.unit_of_work.library import SQLAlchemyLibraryUnitOfWork
 
@@ -158,3 +162,9 @@ def get_get_shelf_books_use_case(
     uow: LibraryUoWDep,
 ) -> GetShelfBooksUseCase:
     return GetShelfBooksUseCase(uow=uow)  # type: ignore
+
+
+def get_get_book_use_case(
+    uow: LibraryUoWDep,
+) -> GetBookUseCase:
+    return GetBookUseCase(uow=uow)  # type: ignore

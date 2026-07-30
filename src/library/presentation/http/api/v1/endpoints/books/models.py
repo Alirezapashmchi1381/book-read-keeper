@@ -22,6 +22,7 @@ class UpdateBookMetadataRequest(BaseModel):
     language: str | None = None
     color: str | None = None
     description: str | None = None
+    is_starred: bool | None = None
 
 
 class BookResponse(BaseModel):
@@ -39,6 +40,16 @@ class BookResponse(BaseModel):
     is_deleted: bool
     created_at: datetime
     updated_at: datetime
+
+
+class ShelfBriefResponse(BaseModel):
+    id: UUID
+    name: str
+    color: str
+
+
+class FullBookResponse(BookResponse):
+    shelves: list[ShelfBriefResponse] = []
 
 
 class BookFileResponse(BaseModel):

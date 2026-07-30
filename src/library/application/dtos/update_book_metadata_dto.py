@@ -18,3 +18,4 @@ class UpdateBookMetadataInputDto:
     language: str | None = None
     color: str | None = None
     description: str | None = None
+    is_starred: bool | None = None
