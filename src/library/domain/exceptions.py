@@ -44,3 +44,7 @@ class FileStorageError(LibraryError):
 
 class InvalidFileError(LibraryError):
     """Raised when an uploaded file is invalid (wrong format, too large, etc.)."""
+
+
+class ResourceCorruptedError(LibraryError):
+    """Raised when an entity is in an unexpected or inconsistent state."""

@@ -20,6 +20,7 @@ from src.identity.presentation.http.exception_handlers import (
 )
 from src.identity.presentation.http.middleware.cors import add_cors
 from src.identity.core.app import create_identity_app
+from src.library.core.app import create_library_app
 
 def create_app() -> FastAPI:
     settings = get_settings()
@@ -34,9 +35,7 @@ def create_app() -> FastAPI:
     add_cors(main_app, settings.cors_origins)
 
     main_app.mount("/identity", create_identity_app())
-    # Bounded contexts
-    # app.include_router(library_v1_router, prefix="/api")   # add when ready
-    # app.include_router(reader_v1_router, prefix="/api")
+    main_app.mount("/library", create_library_app())
 
     return main_app
 
