@@ -1,12 +1,13 @@
 from dataclasses import dataclass, field
 from typing import Optional
+from src.storage.domain.entities.object import Object 
 from src.storage.domain.value_objects.bucket_id import BucketID
 from src.storage.domain.value_objects.object_key import ObjectKey
 from src.storage.domain.value_objects.storage_class import StorageClass
 
 @dataclass
 class Bucket:
-    _id: BucketID                # private by convention
+    _id: BucketID             
     _owner: str
     _max_objects: int = 1000
     _size: int
@@ -17,9 +18,9 @@ class Bucket:
     def create_object(self, key: ObjectKey, content_type: str,
                       storage_class: StorageClass, size: int) -> "Object":  
         if self._object_count >= self._max_objects:
-            raise RuntimeErrorx(f"Bucket {self._id.name} has reached max object limit")
+            raise RuntimeError(f"Bucket {self._id.name} has reached max object limit")
         if self._size_used >= self._size:
-                    raise RuntimeErrorx(f"Bucket {self._id.name} has reached max object limit")
+                    raise RuntimeError(f"Bucket {self._id.name} has reached max object limit")
                 
         
         self._size_used += size
@@ -45,11 +46,9 @@ class Bucket:
             raise ValueError("Owner must be a non-empty string")
         if max_objects <= 0:
             raise ValueError("max_objects must be greater than 0")
-        if siz <= 0:
-            raise ValueError("max_objects must be greater than 0")
+        if size <= 0:
+            raise ValueError("size must be greater than 0")
 
-        # bucket_id is already validated by BucketID value object
-        # Return a new instance with object_count initially 0
         return cls(
             bucket_id=bucket_id,
             owner=owner.strip(),
