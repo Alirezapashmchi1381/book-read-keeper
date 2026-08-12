@@ -222,3 +222,5 @@ CLAUDE.md
 CLAUDE.md
 .env.*
 docs/
+.clinerules/
+memory-bank/
