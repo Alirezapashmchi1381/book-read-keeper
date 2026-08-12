@@ -1,31 +1,27 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Optional,List
-from src.storage.domain.value_objects.bucket_id import BucketID
+from typing import Optional
+
 from src.storage.domain.value_objects.etag import Etag
 from src.storage.domain.value_objects.object_key import ObjectKey
 from src.storage.domain.value_objects.storage_class import StorageClass
 
 
-
-
 @dataclass
 class Object:
-    bucket_id : BucketID
-    key : Object
+    key: ObjectKey
     content_type: str
     storage_class: StorageClass
-    size : int
+    size: int
     etag: Etag
-    version: List[dict]
-    is_deleted: bool
-    created_at: datetime
-    updated_at : datetime
+    versions: list[dict] = field(default_factory=list)
+    is_deleted: bool = False
+    created_at: datetime = field(default_factory=datetime.utcnow)
+    updated_at: datetime = field(default_factory=datetime.utcnow)
 
     @classmethod
     def create(
         cls,
-        bucket_id: BucketID,
         key: ObjectKey,
         storage_class: StorageClass,
         content_type: str = "application/octet-stream",
@@ -34,13 +30,12 @@ class Object:
     ) -> "Object":
         now = datetime.utcnow()
         return cls(
-            bucket_id=bucket_id,
             key=key,
             content_type=content_type,
             storage_class=storage_class,
             size=size,
-            etag=etag or Etag(""),   
-            versions=[],             
+            etag=etag or Etag(""),
+            versions=[],
             created_at=now,
             updated_at=now,
             is_deleted=False,

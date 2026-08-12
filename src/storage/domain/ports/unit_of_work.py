@@ -1,14 +1,7 @@
 from typing import Protocol
 
-from src.storage.domain.ports.bucket_command_repository import BucketCommandRepository
-from src.storage.domain.ports.bucket_query_repository import BucketQueryRepository
 from src.storage.domain.ports.object_command_repository import ObjectCommandRepository
 from src.storage.domain.ports.object_query_repository import ObjectQueryRepository
-
-
-class BucketUoW(Protocol):
-    query: BucketQueryRepository
-    command: BucketCommandRepository
 
 
 class ObjectUoW(Protocol):
@@ -17,7 +10,6 @@ class ObjectUoW(Protocol):
 
 
 class StorageUnitOfWork(Protocol):
-    buckets: BucketUoW
     objects: ObjectUoW
 
     async def __aenter__(self) -> "StorageUnitOfWork": ...
