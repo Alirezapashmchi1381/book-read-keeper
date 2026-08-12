@@ -27,8 +27,13 @@ from src.library.application.use_cases.remove_book_from_shelf import RemoveBookF
 from src.library.application.use_cases.reorder_shelf import ReorderShelfUseCase
 from src.library.application.use_cases.get_shelf_books import GetShelfBooksUseCase
 from src.library.application.use_cases.get_book import GetBookUseCase
-from src.library.infrastructure.services.stub_file_storage import StubFileStorageService
+from src.library.infrastructure.services.storage_file_storage import StorageFileStorageService
 from src.library.infrastructure.sql.unit_of_work.library import SQLAlchemyLibraryUnitOfWork
+from src.storage.application.use_cases.delete_object import DeleteObjectUseCase
+from src.storage.application.use_cases.download_object import DownloadObjectUseCase
+from src.storage.application.use_cases.upload_object import UploadObjectUseCase
+from src.storage.infrastructure.services.s3_file_storage import S3Config, S3FileStorageService
+from src.storage.infrastructure.sql.unit_of_work.storage import SQLAlchemyStorageUnitOfWork
 
 # ---------------------------------------------------------------------------
 # Infrastructure layer
@@ -41,13 +46,35 @@ def get_library_uow(
     return SQLAlchemyLibraryUnitOfWork(session_factory)
 
 
-def get_file_storage() -> StubFileStorageService:
-    return StubFileStorageService()
+def get_storage_uow(
+    session_factory: async_sessionmaker[AsyncSession] = Depends(get_session_factory),
+) -> SQLAlchemyStorageUnitOfWork:
+    return SQLAlchemyStorageUnitOfWork(session_factory)
+
+
+def get_storage_file_storage() -> S3FileStorageService:
+    # TODO: read S3 config from settings.
+    return S3FileStorageService(S3Config(bucket="book-read-keeper"))
+
+
+def get_file_storage(
+    storage_uow: SQLAlchemyStorageUnitOfWork = Depends(get_storage_uow),
+    storage_file_storage: S3FileStorageService = Depends(get_storage_file_storage),
+) -> StorageFileStorageService:
+    upload = UploadObjectUseCase(uow=storage_uow, file_storage=storage_file_storage)
+    download = DownloadObjectUseCase(uow=storage_uow, file_storage=storage_file_storage)
+    delete = DeleteObjectUseCase(uow=storage_uow, file_storage=storage_file_storage)
+    return StorageFileStorageService(
+        upload=upload,
+        download=download,
+        delete=delete,
+        storage_file_storage=storage_file_storage,
+    )
 
 
 # Annotated aliases
 LibraryUoWDep = Annotated[SQLAlchemyLibraryUnitOfWork, Depends(get_library_uow)]
-FileStorageDep = Annotated[StubFileStorageService, Depends(get_file_storage)]
+FileStorageDep = Annotated[StorageFileStorageService, Depends(get_file_storage)]
 
 # ---------------------------------------------------------------------------
 # Use-case providers — one function per use case
