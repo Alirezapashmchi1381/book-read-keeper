@@ -18,8 +18,18 @@ class TestDeleteHighlightUseCase:
 
         fake_uow.highlights.query.find_by_id.assert_awaited_once_with(highlight.id)
         assert highlight.is_deleted is True
-        fake_uow.highlights.command.delete.assert_awaited_once_with(highlight)
+        fake_uow.highlights.command.save.assert_awaited_once_with(highlight)
         assert fake_uow.committed is True
+
+    async def test_repeat_delete_is_idempotent_noop(self, fake_uow) -> None:
+        # Already-deleted highlight -> deleting again is a no-op (no error, no save).
+        highlight = make_highlight(is_deleted=True)
+        fake_uow.highlights.query.find_by_id.return_value = highlight
+
+        use_case = DeleteHighlightUseCase(uow=fake_uow)
+        await use_case.execute(highlight.id)
+
+        fake_uow.highlights.command.save.assert_not_awaited()
 
     async def test_raises_when_highlight_not_found(self, fake_uow) -> None:
         fake_uow.highlights.query.find_by_id.return_value = None
@@ -28,4 +38,4 @@ class TestDeleteHighlightUseCase:
         with pytest.raises(HighlightNotFoundError):
             await use_case.execute(uuid4())
 
-        fake_uow.highlights.command.delete.assert_not_awaited()
+        fake_uow.highlights.command.save.assert_not_awaited()

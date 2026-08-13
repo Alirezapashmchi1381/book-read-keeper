@@ -21,6 +21,7 @@ from src.identity.presentation.http.exception_handlers import (
 from src.identity.presentation.http.middleware.cors import add_cors
 from src.identity.core.app import create_identity_app
 from src.library.core.app import create_library_app
+from src.annotations.core.app import create_annotations_app
 
 def create_app() -> FastAPI:
     settings = get_settings()
@@ -36,6 +37,7 @@ def create_app() -> FastAPI:
 
     main_app.mount("/identity", create_identity_app())
     main_app.mount("/library", create_library_app())
+    main_app.mount("/annotations", create_annotations_app())
 
     return main_app
 

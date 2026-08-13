@@ -10,10 +10,12 @@ class DeleteHighlightUseCase:
     uow: AnnotationsUnitOfWork
 
     async def execute(self, highlight_id: UUID) -> None:
+        """Idempotent soft-delete: deleting an already-deleted highlight is a no-op."""
         async with self.uow as uow:
             highlight = await uow.highlights.query.find_by_id(highlight_id)
             if highlight is None:
                 raise HighlightNotFoundError(f"Highlight {highlight_id} not found")
-            highlight.soft_delete()
-            await uow.highlights.command.delete(highlight)
-            await uow.commit()
+            if not highlight.is_deleted:
+                highlight.soft_delete()
+                await uow.highlights.command.save(highlight)
+                await uow.commit()
